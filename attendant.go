@@ -7,6 +7,10 @@ type Attendant struct {
 	parkingFull []bool
 }
 
+type AttendantNormal struct {
+	*Attendant
+}
+
 func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 	parkinglotSlice := []*ParkingLot{}
 	for _, parkingLot := range parkingLots {
@@ -28,6 +32,20 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 	}
 
 	return &attendant, nil
+}
+
+func (a *Attendant) parkWithLot(parkinglot *ParkingLot, car *Car) error {
+	if car == nil {
+		return errors.New("parkwithlot: car cannot be nil")
+	}
+
+	if a.checkIsCarParked(car) {
+		return errors.New("attendant: car already parked")
+	}
+
+	parkinglot.park(car)
+
+	return nil
 }
 
 func (a *Attendant) Park(car *Car) error {
@@ -89,6 +107,17 @@ func (a *Attendant) checkIsCarParked(car *Car) bool {
 	return false
 }
 
-func (a *Attendant) ParkWithLot(lot *ParkingLot, car *Car) error {
-	return lot.park(car)
+func (a *AttendantNormal) ParkNormal(car *Car) error {
+	var parkingLot *ParkingLot
+
+	for i, p := range a.Parkinglot {
+		if a.parkingFull[i] {
+			continue
+		}
+
+		parkingLot = p
+		return a.parkWithLot(parkingLot, car)
+	}
+
+	return errors.New("parknormal: parkinglots are full")
 }
