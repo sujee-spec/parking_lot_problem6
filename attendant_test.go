@@ -230,3 +230,14 @@ func TestAttendantCannotUnParkNilCar(t *testing.T) {
 		t.Fatal("car should get parked")
 	}
 }
+
+func TestAttendantUseParkingMethodWithParkingLotAndCarAsArgument(t *testing.T) {
+	parkinglot, _ := NewParkingLot(2)
+	attendant, _ := NewAttendant(parkinglot)
+
+	err := attendant.ParkWithLot(parkinglot, &car)
+
+	if err != nil {
+		t.Error("car should be parkied using parkinglot and car as argument")
+	}
+}

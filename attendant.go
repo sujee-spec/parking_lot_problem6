@@ -3,8 +3,8 @@ package parkinglot
 import "errors"
 
 type Attendant struct {
-	Parkinglot      []*ParkingLot
-	parkingStatuses []bool
+	Parkinglot  []*ParkingLot
+	parkingFull []bool
 }
 
 func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
@@ -19,8 +19,8 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 
 	statuses := make([]bool, len(parkingLots))
 	attendant := Attendant{
-		Parkinglot:      parkingLots,
-		parkingStatuses: statuses,
+		Parkinglot:  parkingLots,
+		parkingFull: statuses,
 	}
 
 	for _, parkinglot := range parkinglotSlice {
@@ -40,14 +40,11 @@ func (a *Attendant) Park(car *Car) error {
 	}
 
 	for i, p := range a.Parkinglot {
-		if a.parkingStatuses[i] {
+		if a.parkingFull[i] {
 			continue
 		}
-		err := p.park(car)
-		if err == nil {
-			return nil
-		}
-		return err
+
+		return p.park(car)
 	}
 
 	return errors.New("parking lot is full, attendant cannot park the car")
@@ -72,7 +69,7 @@ func (a *Attendant) UnPark(car *Car) error {
 		if err != nil {
 			return err
 		}
-		a.parkingStatuses[i] = false
+		a.parkingFull[i] = false
 		return nil
 	}
 
@@ -80,7 +77,7 @@ func (a *Attendant) UnPark(car *Car) error {
 }
 
 func (a *Attendant) receiveFull(i int) {
-	a.parkingStatuses[i] = true
+	a.parkingFull[i] = true
 }
 
 func (a *Attendant) checkIsCarParked(car *Car) bool {
@@ -90,4 +87,8 @@ func (a *Attendant) checkIsCarParked(car *Car) bool {
 		}
 	}
 	return false
+}
+
+func (a *Attendant) ParkWithLot(lot *ParkingLot, car *Car) error {
+	return lot.park(car)
 }
