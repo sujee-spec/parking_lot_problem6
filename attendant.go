@@ -2,9 +2,41 @@ package parkinglot
 
 import "errors"
 
+type ParkingType string
+
+const (
+	SimpleParking ParkingType = "simpleParking"
+	EvenParking   ParkingType = "evenParking"
+)
+
 type Attendant struct {
+	parkingPlan  ParkingType
 	Parkinglot   []*ParkingLot
 	parkingsFull []bool
+}
+
+func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Attendant, error) {
+	parkinglotSlice := []*ParkingLot{}
+	for _, parkingLot := range parkingLots {
+		if parkingLot == nil {
+			return nil, errors.New("attendant cannot have nil parkinglot")
+		}
+	}
+
+	parkinglotSlice = append(parkinglotSlice, parkingLots...)
+
+	statuses := make([]bool, len(parkingLots))
+	attendant := Attendant{
+		parkingPlan:  parkingPlan,
+		Parkinglot:   parkingLots,
+		parkingsFull: statuses,
+	}
+
+	for _, parkinglot := range parkinglotSlice {
+		parkinglot.OnFull(&attendant)
+	}
+
+	return &attendant, nil
 }
 
 func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
