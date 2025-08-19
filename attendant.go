@@ -3,8 +3,8 @@ package parkinglot
 import "errors"
 
 type Attendant struct {
-	Parkinglot      []*ParkingLot
-	parkingStatuses []bool
+	Parkinglot   []*ParkingLot
+	parkingsFull []bool
 }
 
 func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
@@ -19,8 +19,8 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 
 	statuses := make([]bool, len(parkingLots))
 	attendant := Attendant{
-		Parkinglot:      parkingLots,
-		parkingStatuses: statuses,
+		Parkinglot:   parkingLots,
+		parkingsFull: statuses,
 	}
 
 	for _, parkinglot := range parkinglotSlice {
@@ -40,10 +40,10 @@ func (a *Attendant) Park(car *Car) error {
 	}
 
 	for i, p := range a.Parkinglot {
-		if a.parkingStatuses[i] {
+		if a.parkingsFull[i] {
 			continue
 		}
-		return  p.park(car)
+		return p.park(car)
 	}
 
 	return errors.New("parking lot is full, attendant cannot park the car")
@@ -68,7 +68,7 @@ func (a *Attendant) UnPark(car *Car) error {
 		if err != nil {
 			return err
 		}
-		a.parkingStatuses[i] = false
+		a.parkingsFull[i] = false
 		return nil
 	}
 
@@ -76,7 +76,7 @@ func (a *Attendant) UnPark(car *Car) error {
 }
 
 func (a *Attendant) receiveFull(i int) {
-	a.parkingStatuses[i] = true
+	a.parkingsFull[i] = true
 }
 
 func (a *Attendant) checkIsCarParked(car *Car) bool {
