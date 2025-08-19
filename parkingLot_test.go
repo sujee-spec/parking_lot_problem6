@@ -303,6 +303,33 @@ func TestCannotNofifyMultiplePeopleWhenParkingAvailable(t *testing.T) {
 
 }
 
+func TestMultipleReceiversShouldBeNotifiedWhenParkingAvailable(t *testing.T) {
+	p, _ := NewParkingLot(1)
+	s := mockParkingAvailableReceiver{}
+	another := mockParkingAvailableReceiver{}
+
+	p.OnAvailable(&s)
+	p.OnAvailable(&another)
+
+	err := p.park(&car)
+	if err != nil {
+		t.Fatal("car should be parked")
+	}
+
+	err = p.unPark(&car)
+	if err != nil {
+		t.Fatal("car should be unparked")
+	}
+
+	if !s.receiveCalled {
+		t.Errorf("the status should be changed to parking_available")
+	}
+	if !another.receiveCalled {
+		t.Errorf("another person should have status parking_available")
+	}
+
+}
+
 type ReceiveBothNotification struct {
 	notifiedFull      bool
 	notifiedAvailable bool

@@ -39,11 +39,11 @@ type ParkingLot struct {
 	capacity             int
 	slots                []slot
 	fullSubscribers      []ParkingFullReceiver
-	availableSubscribers ParkingAvailableReceiver
+	availableSubscribers []ParkingAvailableReceiver
 }
 
 func (p *ParkingLot) OnAvailable(parkingAvailableReceiver ParkingAvailableReceiver) {
-	p.availableSubscribers = parkingAvailableReceiver
+	p.availableSubscribers = append(p.availableSubscribers, parkingAvailableReceiver)
 }
 
 func (p *ParkingLot) OnFull(r ParkingFullReceiver) {
@@ -132,8 +132,11 @@ func (p *ParkingLot) unPark(car *Car) error {
 }
 
 func (p *ParkingLot) notifyAvailableReciever() {
-	if p.availableSubscribers != nil {
-		p.availableSubscribers.receiveAvailable()
+	if p.availableSubscribers == nil {
+		return
+	}
+	for _, r := range p.availableSubscribers {
+		r.receiveAvailable()
 	}
 }
 
