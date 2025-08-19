@@ -10,9 +10,10 @@ const (
 )
 
 type Attendant struct {
-	parkingPlan  ParkingType
-	Parkinglot   []*ParkingLot
-	parkingsFull []bool
+	parkingPlan        ParkingType
+	Parkinglot         []*ParkingLot
+	parkingsFull       []bool
+	slotsOccupiedCount []uint
 }
 
 func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Attendant, error) {
@@ -26,10 +27,12 @@ func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Atten
 	parkinglotSlice = append(parkinglotSlice, parkingLots...)
 
 	statuses := make([]bool, len(parkingLots))
+	slotsOccupiedCount := make([]uint, len(parkingLots))
 	attendant := Attendant{
-		parkingPlan:  parkingPlan,
-		Parkinglot:   parkingLots,
-		parkingsFull: statuses,
+		parkingPlan:        parkingPlan,
+		Parkinglot:         parkingLots,
+		parkingsFull:       statuses,
+		slotsOccupiedCount: slotsOccupiedCount,
 	}
 
 	for _, parkinglot := range parkinglotSlice {
@@ -50,9 +53,11 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 	parkinglotSlice = append(parkinglotSlice, parkingLots...)
 
 	statuses := make([]bool, len(parkingLots))
+	slotsOccupiedCount := make([]uint, len(parkingLots))
 	attendant := Attendant{
-		Parkinglot:   parkingLots,
-		parkingsFull: statuses,
+		Parkinglot:         parkingLots,
+		parkingsFull:       statuses,
+		slotsOccupiedCount: slotsOccupiedCount,
 	}
 
 	for _, parkinglot := range parkinglotSlice {
@@ -71,23 +76,30 @@ func (a *Attendant) Park(car *Car) error {
 		return errors.New("attendant: car already parked")
 	}
 
-	parkinglot := a.findAvailableParkinglot(a.parkingPlan)
+	parkinglot, index := a.findAvailableParkinglot(a.parkingPlan)
 	if parkinglot == nil {
 		return errors.New("parking lot is full, attendant cannot park the car")
 	}
 
-	return parkinglot.park(car)
+	err := parkinglot.park(car)
+	if err != nil {
+		return err
+	}
+	a.slotsOccupiedCount[index]++
+
+	return nil
 }
 
-func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) *ParkingLot {
+func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) (*ParkingLot, int) {
 	//for simple parkinglot plan
 	for i, p := range a.Parkinglot {
 		if a.parkingsFull[i] {
 			continue
 		}
-		return p
+		return p, i
 	}
-	return nil
+	return nil, -1
+
 }
 
 // TODO: refactor
@@ -109,6 +121,7 @@ func (a *Attendant) UnPark(car *Car) error {
 		if err != nil {
 			return err
 		}
+		a.slotsOccupiedCount[i]--
 		a.parkingsFull[i] = false
 		return nil
 	}
