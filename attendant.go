@@ -94,30 +94,25 @@ func (a *Attendant) Park(car *Car) error {
 }
 
 func (a *Attendant) findAvailableParkinglotIndex(parkingPlan ParkingType) int {
-
-	if parkingPlan == EvenParking {
-		count := math.MaxInt64
-		parkinglotIndex := -1
-		for i, parkingCount := range a.slotsOccupiedCount {
-			if parkingCount < uint(count) {
-				count = int(parkingCount)
-				parkinglotIndex = i
+	switch parkingPlan {
+	case EvenParking:
+		minCount := uint(math.MaxInt64)
+		index := -1
+		for i, count := range a.slotsOccupiedCount {
+			if count < minCount {
+				minCount = count
+				index = i
 			}
 		}
-		if parkinglotIndex == -1 {
-			return -1
+		return index
+	default:
+		for i, full := range a.parkingsFull {
+			if !full {
+				return i
+			}
 		}
-		return parkinglotIndex
+		return -1
 	}
-
-	//when simple parking plan or no parkingPlan
-	for i := range a.Parkinglot {
-		if a.parkingsFull[i] {
-			continue
-		}
-		return i
-	}
-	return -1
 }
 
 // TODO: refactor
