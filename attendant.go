@@ -19,14 +19,12 @@ type Attendant struct {
 }
 
 func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Attendant, error) {
-	parkinglotSlice := []*ParkingLot{}
+
 	for _, parkingLot := range parkingLots {
 		if parkingLot == nil {
 			return nil, errors.New("attendant cannot have nil parkinglot")
 		}
 	}
-
-	parkinglotSlice = append(parkinglotSlice, parkingLots...)
 
 	statuses := make([]bool, len(parkingLots))
 	attendant := Attendant{
@@ -35,7 +33,7 @@ func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Atten
 		parkingsFull: statuses,
 	}
 
-	for _, parkinglot := range parkinglotSlice {
+	for _, parkinglot := range parkingLots {
 		parkinglot.OnFull(&attendant)
 	}
 
@@ -43,14 +41,12 @@ func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Atten
 }
 
 func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
-	parkinglotSlice := []*ParkingLot{}
+
 	for _, parkingLot := range parkingLots {
 		if parkingLot == nil {
 			return nil, errors.New("attendant cannot have nil parkinglot")
 		}
 	}
-
-	parkinglotSlice = append(parkinglotSlice, parkingLots...)
 
 	statuses := make([]bool, len(parkingLots))
 	attendant := Attendant{
@@ -58,7 +54,7 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 		parkingsFull: statuses,
 	}
 
-	for _, parkinglot := range parkinglotSlice {
+	for _, parkinglot := range parkingLots {
 		parkinglot.OnFull(&attendant)
 	}
 
@@ -74,17 +70,13 @@ func (a *Attendant) Park(car *Car) error {
 		return errors.New("attendant: car already parked")
 	}
 
-	parkinglot:= a.findAvailableParkinglot(a.parkingPlan)
+	parkinglot := a.findAvailableParkinglot(a.parkingPlan)
 	if parkinglot == nil {
 		return errors.New("parking lot is full, attendant cannot park the car")
 	}
 
-	err := parkinglot.park(car)
-	if err != nil {
-		return err
-	}
+	return parkinglot.park(car)
 
-	return nil
 }
 
 func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) *ParkingLot {
@@ -140,21 +132,20 @@ func (a *Attendant) UnPark(car *Car) error {
 		return errors.New("attendant/unpark: car is not parked")
 	}
 
-	var err error
 	for i, parkinglot := range a.Parkinglot {
 		if !parkinglot.isParked(car) {
 			continue
 		}
+
 		err := parkinglot.unPark(car)
 		if err != nil {
 			return err
 		}
 
 		a.parkingsFull[i] = false
-		return nil
 	}
 
-	return err
+	return nil
 }
 
 func (a *Attendant) receiveFull(i int) {
