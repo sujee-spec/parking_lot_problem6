@@ -244,52 +244,6 @@ func TestAttendantV2IsAbleToAcceptParkingPlan(t *testing.T) {
 		t.Error("attendant should have parkigplan as simpleparking")
 	}
 }
-func TestAttendantIncreaseSlotsOccupiedCountWhenParked(t *testing.T) {
-	parkinglot1, _ := NewParkingLot(2)
-	parkinglot2, _ := NewParkingLot(2)
-
-	attendant, err := NewAttendantV2(SimpleParking, parkinglot1, parkinglot2)
-
-	if err != nil {
-		t.Fatal("attendant should be created wOccupiedCountsith simpelparking plan")
-	}
-	err = attendant.Park(&car)
-	if err != nil {
-		t.Fatal("car should be parked in parkinglot1 in first slot")
-	}
-
-	if attendant.slotsOccupiedCount[0] != 1 {
-		t.Error("count of parkinglot1 should increase to 1 after car gets parked")
-	}
-}
-
-func TestAttendantDecreaseSlotsOccupiedCountWhenUnparked(t *testing.T) {
-	parkinglot1, _ := NewParkingLot(2)
-	parkinglot2, _ := NewParkingLot(2)
-
-	attendant, err := NewAttendantV2(SimpleParking, parkinglot1, parkinglot2)
-
-	if err != nil {
-		t.Fatal("attendant should be created wOccupiedCountsith simpelparking plan")
-	}
-	err = attendant.Park(&car)
-	if err != nil {
-		t.Fatal("car should be parked in parkinglot1 in first slot")
-	}
-
-	if attendant.slotsOccupiedCount[0] != 1 {
-		t.Fatal("count of parkinglot1 should increase to 1 after car gets parked")
-	}
-
-	err = attendant.UnPark(&car)
-	if err != nil {
-		t.Fatal("car should unparked in from parkinglot1")
-	}
-
-	if attendant.slotsOccupiedCount[0] != 0 {
-		t.Error("count of parkinglot1 should decrease to 0 after car gets unparked")
-	}
-}
 
 func TestAddentParkUsingTheEvenPlan(t *testing.T) {
 	parkinglot1, _ := NewParkingLot(2)
@@ -297,22 +251,71 @@ func TestAddentParkUsingTheEvenPlan(t *testing.T) {
 
 	attendant, err := NewAttendantV2(EvenParking, parkinglot1, parkinglot2)
 	if err != nil {
-		t.Fatal("attendant should be created wOccupiedCountsith simpelparking plan")
+		t.Fatal("attendant should be created with evenparking plan")
 	}
 
 	err = attendant.Park(&car)
 	if err != nil {
 		t.Fatal("car should be parked in parkinglot1 in first slot")
 	}
-	if attendant.slotsOccupiedCount[0] != 1 {
+	if attendant.Parkinglot[0].slots[0].car != &car {
 		t.Fatal("count of parkinglot1 should increase to 1 after car gets parked")
 	}
 
-	err = attendant.Park(&Car{"car2"})
+	car2 := &Car{"car2"}
+	err = attendant.Park(car2)
 	if err != nil {
 		t.Fatal("car should be parked in parkinglot2 in first slot")
 	}
-	if attendant.slotsOccupiedCount[1] != 1 {
+	if attendant.Parkinglot[1].slots[0].car != car2 {
 		t.Fatal("count of parkinglot2 should increase to 1 after car2 gets parked")
+	}
+}
+
+func TestAttendantsAccessTheSameParkinglotReference(t *testing.T) {
+	parkinglot1, _ := NewParkingLot(2)
+	parkinglot2, _ := NewParkingLot(2)
+
+	car2 := &Car{numberPlate: "car2"}
+	car3 := &Car{numberPlate: "car3"}
+	car4 := &Car{numberPlate: "car4"}
+
+	simpleAttendant, _ := NewAttendantV2(SimpleParking, parkinglot1, parkinglot2)
+	complexAttendant, _ := NewAttendantV2(EvenParking, parkinglot1, parkinglot2)
+
+	err := simpleAttendant.Park(&car)
+	if err != nil {
+		t.Fatalf("park setup failed for car1 %v", err)
+	}
+
+	err = simpleAttendant.Park(car2)
+	if err != nil {
+		t.Fatalf("park stup failed for car2 %v", err)
+	}
+	if car.isEqual(parkinglot1.slots[0].car) == false {
+		t.Fatal("attendant should park in lot1")
+	}
+
+	err = complexAttendant.Park(car3)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = simpleAttendant.UnPark(&car)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = simpleAttendant.UnPark(car2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = complexAttendant.Park(car4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if car4.isEqual(parkinglot1.slots[0].car) == false {
+		t.Fatalf("car should have been parked in first slot of parkinglot 1")
 	}
 }

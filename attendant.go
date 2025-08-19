@@ -13,10 +13,9 @@ const (
 )
 
 type Attendant struct {
-	parkingPlan        ParkingType
-	Parkinglot         []*ParkingLot
-	parkingsFull       []bool
-	slotsOccupiedCount []uint
+	parkingPlan  ParkingType
+	Parkinglot   []*ParkingLot
+	parkingsFull []bool
 }
 
 func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Attendant, error) {
@@ -30,12 +29,10 @@ func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Atten
 	parkinglotSlice = append(parkinglotSlice, parkingLots...)
 
 	statuses := make([]bool, len(parkingLots))
-	slotsOccupiedCount := make([]uint, len(parkingLots))
 	attendant := Attendant{
-		parkingPlan:        parkingPlan,
-		Parkinglot:         parkingLots,
-		parkingsFull:       statuses,
-		slotsOccupiedCount: slotsOccupiedCount,
+		parkingPlan:  parkingPlan,
+		Parkinglot:   parkingLots,
+		parkingsFull: statuses,
 	}
 
 	for _, parkinglot := range parkinglotSlice {
@@ -56,11 +53,9 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 	parkinglotSlice = append(parkinglotSlice, parkingLots...)
 
 	statuses := make([]bool, len(parkingLots))
-	slotsOccupiedCount := make([]uint, len(parkingLots))
 	attendant := Attendant{
-		Parkinglot:         parkingLots,
-		parkingsFull:       statuses,
-		slotsOccupiedCount: slotsOccupiedCount,
+		Parkinglot:   parkingLots,
+		parkingsFull: statuses,
 	}
 
 	for _, parkinglot := range parkinglotSlice {
@@ -88,7 +83,6 @@ func (a *Attendant) Park(car *Car) error {
 	if err != nil {
 		return err
 	}
-	a.slotsOccupiedCount[index]++
 
 	return nil
 }
@@ -98,9 +92,15 @@ func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) (*ParkingLo
 	if parkingPlan == EvenParking {
 		count := math.MaxInt64
 		parkinglotIndex := -1
-		for i, parkingCount := range a.slotsOccupiedCount {
-			if parkingCount < uint(count) {
-				count = int(parkingCount)
+		for i, plot := range a.Parkinglot {
+			internalCount := 0
+			for _, p := range plot.slots {
+				if p.occupied {
+					internalCount++
+				}
+			}
+			if internalCount < count {
+				count = internalCount
 				parkinglotIndex = i
 			}
 		}
@@ -139,7 +139,7 @@ func (a *Attendant) UnPark(car *Car) error {
 		if err != nil {
 			return err
 		}
-		a.slotsOccupiedCount[i]--
+
 		a.parkingsFull[i] = false
 		return nil
 	}
