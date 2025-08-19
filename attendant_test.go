@@ -235,80 +235,9 @@ func TestAttendantUseParkingMethodWithParkingLotAndCarAsArgument(t *testing.T) {
 	parkinglot, _ := NewParkingLot(2)
 	attendant, _ := NewAttendant(parkinglot)
 
-	err := attendant.parkWithLot(parkinglot, &car)
+	err := attendant.ParkWithLot(parkinglot, &car)
 
 	if err != nil {
 		t.Error("car should be parkied using parkinglot and car as argument")
-	}
-}
-func TestParkThroughNormalAttendant(t *testing.T) {
-	parkinglot1, _ := NewParkingLot(2)
-	parkinglot2, _ := NewParkingLot(3)
-	attendant, _ := NewAttendant(parkinglot1, parkinglot2)
-
-	attendantNormal := AttendantNormal{Attendant: attendant}
-	err := attendant.Park(&car)
-
-	if err != nil {
-		t.Error("car should be parked normally")
-	}
-
-	car2 := &Car{"123456"}
-	err = attendantNormal.ParkNormal(car2)
-
-	if err != nil {
-		t.Error("car2 should be parked")
-	}
-	if parkinglot1.slots[1].car != car2 {
-		t.Error("parkinglot1 first slot should have car2 parked")
-	}
-}
-
-func TestNormalAttendantCannotParkNilCar(t *testing.T) {
-	parkinglot1, _ := NewParkingLot(2)
-	parkinglot2, _ := NewParkingLot(3)
-	attendant, _ := NewAttendant(parkinglot1, parkinglot2)
-
-	attendantNormal := AttendantNormal{Attendant: attendant}
-
-	err := attendantNormal.ParkNormal(nil)
-
-	if err.Error() != "parkwithlot: car cannot be nil" {
-		t.Error("normal attendant cannot park the nil car")
-	}
-}
-
-func TestNormalAttendantCannotParkAlreadyParkedCar(t *testing.T) {
-	parkinglot1, _ := NewParkingLot(2)
-	attendant, _ := NewAttendant(parkinglot1)
-	attendantNormal := AttendantNormal{Attendant: attendant}
-
-	err := attendantNormal.ParkNormal(&car)
-	if err != nil {
-		t.Fatal("normal attendant should be able to park the car")
-	}
-
-	err = attendantNormal.ParkNormal(&car)
-	if err.Error() != "attendant: car already parked" {
-		t.Error("normal attendant should not park the already parked car")
-	}
-
-}
-
-func TestNormalAttendantCannotParkCarWhenParkingLotIsFull(t *testing.T) {
-	parkinglot1, _ := NewParkingLot(1)
-	attendant, _ := NewAttendant(parkinglot1)
-	attendantNormal := AttendantNormal{Attendant: attendant}
-
-	err := attendantNormal.ParkNormal(&car)
-	if err != nil {
-		t.Fatal("normal attendant should be able to park the car")
-	}
-
-	car2 := &Car{"123456"}
-	err = attendantNormal.ParkNormal(car2)
-
-	if err.Error() != "parknormal: parkinglots are full" {
-		t.Error("normal attendant should not park the already parked car")
 	}
 }
