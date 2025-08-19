@@ -290,3 +290,29 @@ func TestAttendantDecreaseSlotsOccupiedCountWhenUnparked(t *testing.T) {
 		t.Error("count of parkinglot1 should decrease to 0 after car gets unparked")
 	}
 }
+
+func TestAddentParkUsingTheEvenPlan(t *testing.T) {
+	parkinglot1, _ := NewParkingLot(2)
+	parkinglot2, _ := NewParkingLot(2)
+
+	attendant, err := NewAttendantV2(EvenParking, parkinglot1, parkinglot2)
+	if err != nil {
+		t.Fatal("attendant should be created wOccupiedCountsith simpelparking plan")
+	}
+
+	err = attendant.Park(&car)
+	if err != nil {
+		t.Fatal("car should be parked in parkinglot1 in first slot")
+	}
+	if attendant.slotsOccupiedCount[0] != 1 {
+		t.Fatal("count of parkinglot1 should increase to 1 after car gets parked")
+	}
+
+	err = attendant.Park(&Car{"car2"})
+	if err != nil {
+		t.Fatal("car should be parked in parkinglot2 in first slot")
+	}
+	if attendant.slotsOccupiedCount[1] != 1 {
+		t.Fatal("count of parkinglot2 should increase to 1 after car2 gets parked")
+	}
+}

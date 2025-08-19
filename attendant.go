@@ -1,6 +1,9 @@
 package parkinglot
 
-import "errors"
+import (
+	"errors"
+	"math"
+)
 
 type ParkingType string
 
@@ -77,7 +80,7 @@ func (a *Attendant) Park(car *Car) error {
 	}
 
 	parkinglot, index := a.findAvailableParkinglot(a.parkingPlan)
-	if parkinglot == nil {
+	if parkinglot == nil || index < 0 {
 		return errors.New("parking lot is full, attendant cannot park the car")
 	}
 
@@ -91,7 +94,23 @@ func (a *Attendant) Park(car *Car) error {
 }
 
 func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) (*ParkingLot, int) {
-	//for simple parkinglot plan
+
+	if parkingPlan == EvenParking {
+		count := math.MaxInt64
+		parkinglotIndex := -1
+		for i, parkingCount := range a.slotsOccupiedCount {
+			if parkingCount < uint(count) {
+				count = int(parkingCount)
+				parkinglotIndex = i
+			}
+		}
+		if parkinglotIndex == -1 {
+			return nil, -1
+		}
+		return a.Parkinglot[parkinglotIndex], parkinglotIndex
+	}
+
+	//when simple parking plan or no parkingPlan
 	for i, p := range a.Parkinglot {
 		if a.parkingsFull[i] {
 			continue
@@ -99,7 +118,6 @@ func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) (*ParkingLo
 		return p, i
 	}
 	return nil, -1
-
 }
 
 // TODO: refactor
