@@ -79,12 +79,12 @@ func (a *Attendant) Park(car *Car) error {
 		return errors.New("attendant: car already parked")
 	}
 
-	parkinglot, index := a.findAvailableParkinglot(a.parkingPlan)
-	if parkinglot == nil || index < 0 {
+	index := a.findAvailableParkinglotIndex(a.parkingPlan)
+	if index < 0 {
 		return errors.New("parking lot is full, attendant cannot park the car")
 	}
 
-	err := parkinglot.park(car)
+	err := a.Parkinglot[index].park(car)
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func (a *Attendant) Park(car *Car) error {
 	return nil
 }
 
-func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) (*ParkingLot, int) {
+func (a *Attendant) findAvailableParkinglotIndex(parkingPlan ParkingType) int {
 
 	if parkingPlan == EvenParking {
 		count := math.MaxInt64
@@ -105,19 +105,19 @@ func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) (*ParkingLo
 			}
 		}
 		if parkinglotIndex == -1 {
-			return nil, -1
+			return -1
 		}
-		return a.Parkinglot[parkinglotIndex], parkinglotIndex
+		return parkinglotIndex
 	}
 
 	//when simple parking plan or no parkingPlan
-	for i, p := range a.Parkinglot {
+	for i := range a.Parkinglot {
 		if a.parkingsFull[i] {
 			continue
 		}
-		return p, i
+		return i
 	}
-	return nil, -1
+	return -1
 }
 
 // TODO: refactor
