@@ -79,12 +79,12 @@ func (a *Attendant) Park(car *Car) error {
 		return errors.New("attendant: car already parked")
 	}
 
-	index := a.findAvailableParkinglotIndex(a.parkingPlan)
-	if index < 0 {
+	parkinglot, index := a.findAvailableParkinglot(a.parkingPlan)
+	if parkinglot == nil || index < 0 {
 		return errors.New("parking lot is full, attendant cannot park the car")
 	}
 
-	err := a.Parkinglot[index].park(car)
+	err := parkinglot.park(car)
 	if err != nil {
 		return err
 	}
@@ -93,26 +93,31 @@ func (a *Attendant) Park(car *Car) error {
 	return nil
 }
 
-func (a *Attendant) findAvailableParkinglotIndex(parkingPlan ParkingType) int {
-	switch parkingPlan {
-	case EvenParking:
-		minCount := uint(math.MaxInt64)
-		index := -1
-		for i, count := range a.slotsOccupiedCount {
-			if count < minCount {
-				minCount = count
-				index = i
+func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) (*ParkingLot, int) {
+
+	if parkingPlan == EvenParking {
+		count := math.MaxInt64
+		parkinglotIndex := -1
+		for i, parkingCount := range a.slotsOccupiedCount {
+			if parkingCount < uint(count) {
+				count = int(parkingCount)
+				parkinglotIndex = i
 			}
 		}
-		return index
-	default:
-		for i, full := range a.parkingsFull {
-			if !full {
-				return i
-			}
+		if parkinglotIndex == -1 {
+			return nil, -1
 		}
-		return -1
+		return a.Parkinglot[parkinglotIndex], parkinglotIndex
 	}
+
+	//when simple parking plan or no parkingPlan
+	for i, p := range a.Parkinglot {
+		if a.parkingsFull[i] {
+			continue
+		}
+		return p, i
+	}
+	return nil, -1
 }
 
 // TODO: refactor
