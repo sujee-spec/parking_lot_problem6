@@ -87,37 +87,47 @@ func (a *Attendant) Park(car *Car) error {
 	return nil
 }
 
-func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) (*ParkingLot) {
+func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) *ParkingLot {
+	switch parkingPlan {
+	case EvenParking:
+		return a.findEvenlyDistributedParkingLot()
+	default:
+		return a.findFirstAvailableParkingLot()
+	}
+}
 
-	if parkingPlan == EvenParking {
-		count := math.MaxInt64
-		parkinglotIndex := -1
-		for i, plot := range a.Parkinglot {
-			internalCount := 0
-			for _, p := range plot.slots {
-				if p.occupied {
-					internalCount++
-				}
-			}
-			if internalCount < count {
-				count = internalCount
-				parkinglotIndex = i
-			}
+func (a *Attendant) findEvenlyDistributedParkingLot() *ParkingLot {
+	minOccupied := math.MaxInt64
+	var selectedLot *ParkingLot
+
+	for _, lot := range a.Parkinglot {
+		occupiedCount := countOccupiedSlots(lot)
+		if occupiedCount < minOccupied {
+			minOccupied = occupiedCount
+			selectedLot = lot
 		}
-		if parkinglotIndex == -1 {
-			return nil
-		}
-		return a.Parkinglot[parkinglotIndex]
 	}
 
-	//when simple parking plan or no parkingPlan
-	for i, p := range a.Parkinglot {
-		if a.parkingsFull[i] {
-			continue
+	return selectedLot
+}
+
+func (a *Attendant) findFirstAvailableParkingLot() *ParkingLot {
+	for i, lot := range a.Parkinglot {
+		if !a.parkingsFull[i] {
+			return lot
 		}
-		return p
 	}
 	return nil
+}
+
+func countOccupiedSlots(lot *ParkingLot) int {
+	count := 0
+	for _, slot := range lot.slots {
+		if slot.occupied {
+			count++
+		}
+	}
+	return count
 }
 
 // TODO: refactor
