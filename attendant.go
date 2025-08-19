@@ -71,14 +71,23 @@ func (a *Attendant) Park(car *Car) error {
 		return errors.New("attendant: car already parked")
 	}
 
+	parkinglot := a.findAvailableParkinglot(a.parkingPlan)
+	if parkinglot == nil {
+		return errors.New("parking lot is full, attendant cannot park the car")
+	}
+
+	return parkinglot.park(car)
+}
+
+func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) *ParkingLot {
+	//for simple parkinglot plan
 	for i, p := range a.Parkinglot {
 		if a.parkingsFull[i] {
 			continue
 		}
-		return p.park(car)
+		return p
 	}
-
-	return errors.New("parking lot is full, attendant cannot park the car")
+	return nil
 }
 
 // TODO: refactor
