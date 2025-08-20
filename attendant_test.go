@@ -276,33 +276,45 @@ func TestAttendantsAccessTheSameParkinglotReference(t *testing.T) {
 	if err != nil {
 		t.Fatalf("simple attendant should be able to park car in parkinglot 1,  %v", err)
 	}
+	if !parkinglot1.slots[0].car.isEqual(&car) {
+		t.Fatal("car should be parked in parkinglot 1, first slot")
+	}
 
 	err = simpleAttendant.Park(car2)
 	if err != nil {
 		t.Fatalf("simple attendant should be able to park car2 in parkinglot 1,  %v", err)
 	}
 	if car.isEqual(parkinglot1.slots[0].car) == false {
-		t.Fatal("attendant should park in lot1, first slot")
+		t.Fatal("attendant should park in lot1, second slot")
 	}
 
 	err = complexAttendant.Park(car3)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("car3 should be parked")
+	}
+	if !parkinglot2.slots[0].car.isEqual(car3) {
+		t.Fatal("car3 should be parked in parkinglot 2, first slot")
 	}
 
 	err = simpleAttendant.UnPark(&car)
 	if err != nil {
 		t.Fatalf("simpleattendant should unpark the car %v", err)
 	}
+	if parkinglot1.slots[0].occupied == true {
+		t.Fatal("parkinglot 1, first slot should be empty after car unpark")
+	}
 
 	err = simpleAttendant.UnPark(car2)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("ca2 should get unpark")
+	}
+	if parkinglot1.slots[1].occupied == true {
+		t.Fatal("parkinglot 1, second slot should be empty afer car2 unpark")
 	}
 
 	err = complexAttendant.Park(car4)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("car4 should get park")
 	}
 	if car4.isEqual(parkinglot1.slots[0].car) == false {
 		t.Fatalf("car should have been parked in first slot of parkinglot 1")
