@@ -12,7 +12,7 @@ func TestCreateLot(t *testing.T) {
 	}
 
 	if firstLot.id == 0 {
-		t.Error("Struct Lot cannot be created with Id 0")
+		t.Error("struct lot cannot be created with id 0")
 	}
 }
 
@@ -32,8 +32,9 @@ func TestCreateEmptyLotsInParkingLot(t *testing.T) {
 
 func TestCannotCreateParkingLotWithCapacityLessThanOne(t *testing.T) {
 	_, err := NewParkingLot(-1)
-	if err == nil {
-		t.Error("Parking lot cannot be created with capacity less than 1")
+	expectedError := "cannot create parking lot with capacity less than 1"
+	if err.Error() != expectedError {
+		t.Error("parking lot cannot be created with capacity less than 1")
 	}
 }
 
@@ -44,7 +45,7 @@ func TestParkCar(t *testing.T) {
 	}
 	err := parkingLot.park(&car)
 	if err != nil {
-		t.Errorf("Vehicle not parked")
+		t.Errorf("vehicle should get parked")
 	}
 }
 
@@ -102,7 +103,8 @@ func TestCheckIfParkingLotIsFull(t *testing.T) {
 	p.park(car1)
 	err := p.park(car2)
 
-	if err == nil {
+	expectedError := "parkinglot full, cannot park more cars"
+	if err.Error() != expectedError {
 		t.Errorf("ParkingLot is full")
 	}
 
@@ -177,7 +179,7 @@ func TestUnparkCar(t *testing.T) {
 
 	err := p.unPark(car)
 	if err != nil {
-		t.Errorf("Car not unparked")
+		t.Errorf("car should get unpark")
 
 	}
 }
@@ -191,7 +193,7 @@ func TestUnparkCarNotFound(t *testing.T) {
 
 	err := p.unPark(car)
 	if err != nil {
-		t.Errorf("Car not found")
+		t.Errorf("car should get unpark")
 	}
 }
 
@@ -205,7 +207,7 @@ func TestCarIsParked(t *testing.T) {
 	result := p.isParked(car)
 
 	if !result {
-		t.Errorf("Car is not parked in the ParkingLot")
+		t.Errorf("cat should be found in the parking lot")
 	}
 
 }
@@ -220,8 +222,10 @@ func TestCheckIfCarAlreadyParked(t *testing.T) {
 	}
 	p.park(car1)
 	err := p.park(car2)
-	if err == nil {
-		t.Errorf("Car is already parked")
+
+	expectedError := "parkinglot cannot park already parked car"
+	if err.Error() != expectedError {
+		t.Errorf("cannot park already parked car")
 	}
 
 }
@@ -247,10 +251,10 @@ func TestMultipleReceiversShouldBeNotifiedWhenParkingFull(t *testing.T) {
 	p.park(&car)
 
 	if !s.parkingFull {
-		t.Errorf("The status should be changed to parking_full")
+		t.Errorf("the status should be changed to parking_full")
 	}
 	if !another.parkingFull {
-		t.Errorf("Another person should have status parking_full")
+		t.Errorf("another person should have status parking_full")
 	}
 
 }
@@ -271,7 +275,7 @@ func TestSingleRecieverNotifiedParkingAvailable(t *testing.T) {
 	p.unPark(&car)
 
 	if !parkingAvailableReceiver.receiveCalled {
-		t.Errorf("Receive Function not called")
+		t.Errorf("receive function should be called")
 	}
 }
 func TestUnparkNotParkedCar(t *testing.T) {
@@ -279,7 +283,8 @@ func TestUnparkNotParkedCar(t *testing.T) {
 
 	err := parkinglot.unPark(&car)
 
-	if err.Error() != "Car is not found in the parking lot" {
+	expectedError := "parkinglot cannot unpark, car not found in parkinglot"
+	if err.Error() != expectedError {
 		t.Errorf("parkinglot cannot unpark the not existing car")
 	}
 }
@@ -294,19 +299,19 @@ func TestCannotNofifyMultiplePeopleWhenParkingAvailable(t *testing.T) {
 
 	p.park(&car)
 	if !parkingFullReceiver.parkingFull {
-		t.Errorf("Only one person should be notified for parking availability")
+		t.Errorf("only one person should be notified for parking availability")
 	}
 	if parkingAvailableReceiver.receiveCalled == true {
-		t.Errorf("Parking Available Receiver should not be notified when parking full")
+		t.Errorf("parking available receiver should not be notified when parking full")
 	}
 
 	p.unPark(&car)
 	if !parkingFullReceiver.parkingFull {
-		t.Errorf("Only one person should be notified for parking availability")
+		t.Errorf("only one person should be notified for parking availability")
 	}
 
 	if !parkingAvailableReceiver.receiveCalled {
-		t.Errorf("This receiver has to be Notified when parking is available")
+		t.Errorf("receiver has to be Notified when parking is available")
 	}
 
 }

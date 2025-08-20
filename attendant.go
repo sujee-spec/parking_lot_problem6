@@ -46,7 +46,7 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 
 	for _, parkingLot := range parkingLots {
 		if parkingLot == nil {
-			return nil, errors.New("attendant cannot have nil parkinglot")
+			return nil, errors.New("newattendant cannot have nil parkinglot")
 		}
 	}
 
@@ -66,11 +66,11 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 
 func (a *Attendant) Park(car *Car) error {
 	if car == nil {
-		return errors.New("car cannot be nil")
+		return errors.New("attendant cannot park nil car")
 	}
 
 	if a.checkIsCarParked(car) {
-		return errors.New("attendant: car already parked")
+		return errors.New("attendant cannot park already parked car")
 	}
 
 	parkinglot := a.parkinglotMethodStyle(a)
@@ -134,11 +134,11 @@ func countOccupiedSlots(lot *ParkingLot) int {
 // TODO: refactor
 func (a *Attendant) UnPark(car *Car) error {
 	if car == nil {
-		return errors.New("attendant/unpark: car cannot be nil")
+		return errors.New("attendant cannot unpark nil car")
 	}
 
 	if !a.checkIsCarParked(car) {
-		return errors.New("attendant/unpark: car is not parked")
+		return errors.New("attendant cannot unpark, car not found in parlinglots")
 	}
 
 	for i, parkinglot := range a.Parkinglots {

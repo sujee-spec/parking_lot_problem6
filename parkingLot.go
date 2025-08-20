@@ -75,10 +75,10 @@ func NewParkingLot(capacity int) (*ParkingLot, error) {
 
 func (p *ParkingLot) park(c *Car) error {
 	if c == nil {
-		return errors.New("park: car cannot be nil")
+		return errors.New("parkinglot cannot park nil car")
 	}
 	if p.isParked(c) {
-		return errors.New("Car already parked")
+		return errors.New("parkinglot cannot park already parked car")
 	}
 	for i := 0; i < p.capacity; i++ {
 		if p.slots[i].isNotEmpty() {
@@ -95,7 +95,7 @@ func (p *ParkingLot) park(c *Car) error {
 		return nil
 
 	}
-	return errors.New("ParkingLot is full")
+	return errors.New("parkinglot full, cannot park more cars")
 
 }
 
@@ -110,11 +110,11 @@ func (p *ParkingLot) isFullyFilled() bool {
 
 func (p *ParkingLot) unPark(car *Car) error {
 	if car == nil {
-		return errors.New("unpark: car cannot be nil")
+		return errors.New("parkinglot cannot unpark nil car") //
 	}
 
 	if !p.isParked(car) {
-		return errors.New("Car is not found in the parking lot")
+		return errors.New("parkinglot cannot unpark, car not found in parkinglot")
 	}
 
 	for i := 0; i < p.capacity; i++ {

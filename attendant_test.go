@@ -14,7 +14,7 @@ func TestCreateNewAttendant(t *testing.T) {
 func TestAttedantCannotBeCreatedWithNilParkingLot(t *testing.T) {
 	_, err := NewAttendant(nil)
 
-	const expectedError = "attendant cannot have nil parkinglot"
+	const expectedError = "newattendant cannot have nil parkinglot"
 
 	if err.Error() != expectedError {
 		t.Error("attendant should not create with nil parking lot")
@@ -85,7 +85,7 @@ func TestAttendantCannotParkNilCar(t *testing.T) {
 	attendant, _ := NewAttendant(parkinglot)
 
 	err := attendant.Park(nil)
-	expectedError := "car cannot be nil"
+	expectedError := "attendant cannot park nil car"
 
 	if err.Error() != expectedError {
 		t.Errorf("attendant cannot park nil car")
@@ -208,7 +208,9 @@ func TestAttendantCannotParkSameCarAgain(t *testing.T) {
 	}
 
 	err = attendant.Park(&car)
-	if err.Error() != "attendant: car already parked" {
+
+	expectedError := "attendant cannot park already parked car"
+	if err.Error() != expectedError {
 		t.Error("car cannot be parked again")
 	}
 
@@ -226,7 +228,8 @@ func TestAttendantCannotUnParkNilCar(t *testing.T) {
 	}
 
 	err = attendant.UnPark(nil)
-	if err.Error() != "attendant/unpark: car cannot be nil" {
+	expectedError := "attendant cannot unpark nil car"
+	if err.Error() != expectedError {
 		t.Fatal("car should get parked")
 	}
 }
@@ -271,15 +274,15 @@ func TestAttendantsAccessTheSameParkinglotReference(t *testing.T) {
 
 	err := simpleAttendant.Park(&car)
 	if err != nil {
-		t.Fatalf("park setup failed for car1 %v", err)
+		t.Fatalf("simple attendant should be able to park car in parkinglot 1,  %v", err)
 	}
 
 	err = simpleAttendant.Park(car2)
 	if err != nil {
-		t.Fatalf("park stup failed for car2 %v", err)
+		t.Fatalf("simple attendant should be able to park car2 in parkinglot 1,  %v", err)
 	}
 	if car.isEqual(parkinglot1.slots[0].car) == false {
-		t.Fatal("attendant should park in lot1")
+		t.Fatal("attendant should park in lot1, first slot")
 	}
 
 	err = complexAttendant.Park(car3)
@@ -289,7 +292,7 @@ func TestAttendantsAccessTheSameParkinglotReference(t *testing.T) {
 
 	err = simpleAttendant.UnPark(&car)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("simpleattendant should unpark the car %v", err)
 	}
 
 	err = simpleAttendant.UnPark(car2)
