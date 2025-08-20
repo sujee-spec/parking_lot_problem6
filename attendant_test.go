@@ -231,20 +231,6 @@ func TestAttendantCannotUnParkNilCar(t *testing.T) {
 	}
 }
 
-func TestAttendantV2IsAbleToAcceptParkingPlan(t *testing.T) {
-	parkinglot1, _ := NewParkingLot(2)
-	parkinglot2, _ := NewParkingLot(2)
-
-	attendant, err := NewAttendantV2(SimpleParking, parkinglot1, parkinglot2)
-
-	if err != nil {
-		t.Fatal("attendant should be created with simpelparking plan")
-	}
-	if attendant.parkingPlan != SimpleParking {
-		t.Error("attendant should have parkigplan as simpleparking")
-	}
-}
-
 func TestAddentParkUsingTheEvenPlan(t *testing.T) {
 	parkinglot1, _ := NewParkingLot(2)
 	parkinglot2, _ := NewParkingLot(2)

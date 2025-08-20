@@ -16,7 +16,6 @@ type parkinglotMethod func(*Attendant) *ParkingLot
 
 type Attendant struct {
 	parkinglotMethodStyle parkinglotMethod
-	parkingPlan           ParkingType
 	Parkinglots           []*ParkingLot
 	parkingsFull          []bool
 }
@@ -28,10 +27,8 @@ func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Atten
 		return nil, err
 	}
 
-	attendant.parkingPlan = parkingPlan
-
 	var decideParkinglotMethod parkinglotMethod
-	if attendant.parkingPlan == EvenParking {
+	if parkingPlan == EvenParking {
 		decideParkinglotMethod = findEvenlyDistributedParkingLot
 	} else {
 		decideParkinglotMethod = findFirstAvailableParkingLot
