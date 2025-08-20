@@ -61,6 +61,10 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 		parkinglot.OnFull(&attendant)
 	}
 
+	for _, parkinglot := range parkingLots {
+		parkinglot.OnAvailable(&attendant)
+	}
+
 	return &attendant, nil
 }
 
@@ -141,7 +145,7 @@ func (a *Attendant) UnPark(car *Car) error {
 		return errors.New("attendant cannot unpark, car not found in parlinglots")
 	}
 
-	for i, parkinglot := range a.Parkinglots {
+	for _, parkinglot := range a.Parkinglots {
 		if !parkinglot.isParked(car) {
 			continue
 		}
@@ -151,7 +155,6 @@ func (a *Attendant) UnPark(car *Car) error {
 			return err
 		}
 
-		a.parkingsFull[i] = false
 	}
 
 	return nil
@@ -159,6 +162,10 @@ func (a *Attendant) UnPark(car *Car) error {
 
 func (a *Attendant) receiveFull(i int) {
 	a.parkingsFull[i] = true
+}
+
+func (a *Attendant) receiveAvailable(i int) {
+	a.parkingsFull[i] = false
 }
 
 func (a *Attendant) checkIsCarParked(car *Car) bool {

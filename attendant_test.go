@@ -348,3 +348,49 @@ func TestAttendParkInLotWithMostCapacity(t *testing.T) {
 	}
 
 }
+
+func TestMultipleAttendantsSubscribeToBothParkingNotifications(t *testing.T) {
+	parkinglot1, _ := NewParkingLot(2)
+	parkinglot2, _ := NewParkingLot(2)
+
+	car2 := &Car{numberPlate: "car2"}
+
+	simpleAttendant, _ := NewAttendantV2(FirstAvailableParking, parkinglot1, parkinglot2)
+	complexAttendant, _ := NewAttendantV2(EvenDistributionParking, parkinglot1, parkinglot2)
+
+	err := simpleAttendant.Park(&car)
+	if err != nil {
+		t.Fatalf("simple attendant should be able to park car in parkinglot 1")
+	}
+	if !parkinglot1.slots[0].car.isEqual(&car) {
+		t.Fatal("car should be parked in parkinglot 1, first slot")
+	}
+
+	// attendant gets notification for parking full
+	err = simpleAttendant.Park(car2)
+	if err != nil {
+		t.Fatalf("simple attendant should be able to park car2 in parkinglot 1")
+	}
+	if car.isEqual(parkinglot1.slots[0].car) == false {
+		t.Fatal("attendant should park in lot1, first slot")
+	}
+	if simpleAttendant.parkingsFull[0] != true {
+		t.Fatal("simple attendant should receive parking full notification")
+	}
+	if complexAttendant.parkingsFull[0] != true {
+		t.Fatal("complex attendant should receive parking full notification")
+	}
+
+	// attendant gets notification for parking available
+	err = simpleAttendant.UnPark(&car)
+	if err != nil {
+		t.Fatalf("simpleattendant should unpark the car %v", err)
+	}
+	if simpleAttendant.parkingsFull[0] != false {
+		t.Fatal("simple attendant should receive parking full notification")
+	}
+	if complexAttendant.parkingsFull[0] != false {
+		t.Fatal("complex attendant should receive parking full notification")
+	}
+
+}
