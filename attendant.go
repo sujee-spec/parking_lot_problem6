@@ -150,11 +150,7 @@ func (a *Attendant) UnPark(car *Car) error {
 			continue
 		}
 
-		err := parkinglot.unPark(car)
-		if err != nil {
-			return err
-		}
-
+		return parkinglot.unPark(car)
 	}
 
 	return nil
