@@ -263,7 +263,7 @@ type mockParkingAvailableReceiver struct {
 	receiveCalled bool
 }
 
-func (m *mockParkingAvailableReceiver) receiveAvailable() {
+func (m *mockParkingAvailableReceiver) receiveAvailable(i int) {
 	m.receiveCalled = !m.receiveCalled
 }
 
@@ -352,7 +352,7 @@ func (o *ReceiveBothNotification) receiveFull(int) {
 	o.notifiedFull = true
 }
 
-func (o *ReceiveBothNotification) receiveAvailable() {
+func (o *ReceiveBothNotification) receiveAvailable(int) {
 	o.notifiedAvailable = true
 }
 
