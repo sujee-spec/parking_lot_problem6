@@ -258,7 +258,7 @@ func TestAddentParkUsingTheEvenPlan(t *testing.T) {
 	if err != nil {
 		t.Fatal("car should be parked in parkinglot1 in first slot")
 	}
-	if attendant.Parkinglot[0].slots[0].car != &car {
+	if attendant.Parkinglots[0].slots[0].car != &car {
 		t.Fatal("count of parkinglot1 should increase to 1 after car gets parked")
 	}
 
@@ -267,7 +267,7 @@ func TestAddentParkUsingTheEvenPlan(t *testing.T) {
 	if err != nil {
 		t.Fatal("car should be parked in parkinglot2 in first slot")
 	}
-	if attendant.Parkinglot[1].slots[0].car != car2 {
+	if attendant.Parkinglots[1].slots[0].car != car2 {
 		t.Fatal("count of parkinglot2 should increase to 1 after car2 gets parked")
 	}
 }

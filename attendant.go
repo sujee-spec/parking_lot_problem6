@@ -17,7 +17,7 @@ type parkinglotMethod func(*Attendant) *ParkingLot
 type Attendant struct {
 	parkinglotMethodStyle parkinglotMethod
 	parkingPlan           ParkingType
-	Parkinglot            []*ParkingLot
+	Parkinglots           []*ParkingLot
 	parkingsFull          []bool
 }
 
@@ -53,7 +53,7 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 	statuses := make([]bool, len(parkingLots))
 	attendant := Attendant{
 		parkinglotMethodStyle: findFirstAvailableParkingLot,
-		Parkinglot:            parkingLots,
+		Parkinglots:           parkingLots,
 		parkingsFull:          statuses,
 	}
 
@@ -86,7 +86,7 @@ func findEvenlyDistributedParkingLot(a *Attendant) *ParkingLot {
 	minOccupied := math.MaxInt64
 	var selectedLot *ParkingLot
 
-	for _, lot := range a.Parkinglot {
+	for _, lot := range a.Parkinglots {
 		occupiedCount := countOccupiedSlots(lot)
 		if occupiedCount < minOccupied {
 			minOccupied = occupiedCount
@@ -98,7 +98,7 @@ func findEvenlyDistributedParkingLot(a *Attendant) *ParkingLot {
 }
 
 func findFirstAvailableParkingLot(a *Attendant) *ParkingLot {
-	for i, lot := range a.Parkinglot {
+	for i, lot := range a.Parkinglots {
 		if !a.parkingsFull[i] {
 			return lot
 		}
@@ -126,7 +126,7 @@ func (a *Attendant) UnPark(car *Car) error {
 		return errors.New("attendant/unpark: car is not parked")
 	}
 
-	for i, parkinglot := range a.Parkinglot {
+	for i, parkinglot := range a.Parkinglots {
 		if !parkinglot.isParked(car) {
 			continue
 		}
@@ -147,7 +147,7 @@ func (a *Attendant) receiveFull(i int) {
 }
 
 func (a *Attendant) checkIsCarParked(car *Car) bool {
-	for _, parkinglot := range a.Parkinglot {
+	for _, parkinglot := range a.Parkinglots {
 		if parkinglot.isParked(car) {
 			return true
 		}
