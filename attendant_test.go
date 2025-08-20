@@ -305,3 +305,43 @@ func TestAttendantsAccessTheSameParkinglotReference(t *testing.T) {
 		t.Fatalf("car should have been parked in first slot of parkinglot 1")
 	}
 }
+
+func TestAttendParkInLotWithMostCapacity(t *testing.T) {
+	parkinglot1, _ := NewParkingLot(2)
+	parkinglot2, _ := NewParkingLot(3)
+
+	car2 := &Car{numberPlate: "car2"}
+	car3 := &Car{numberPlate: "car3"}
+	evenTypeAttendant, _ := NewAttendantV2(EvenParking, parkinglot1, parkinglot2)
+	mostTypeAttendant, _ := NewAttendantV2(MostCapacity, parkinglot1, parkinglot2)
+
+	err := evenTypeAttendant.Park(&car)
+	if err != nil {
+		t.Fatal("car should be parked in parkinglot1")
+	}
+
+	err = evenTypeAttendant.Park(car2)
+	if err != nil {
+		t.Fatal("car2 should be parked in the parkinglot")
+	}
+	if !parkinglot2.slots[0].car.isEqual(car2) {
+		t.Fatal("car2 should be parked in the parkinglot2, first slot")
+	}
+
+	err = evenTypeAttendant.UnPark(&car)
+	if err != nil {
+		t.Fatal("evenattendant should be unpark car")
+	}
+	if !parkinglot1.slots[0].isEmpty() {
+		t.Fatal("after car unpark, the parkinglot1, first slot should be empty")
+	}
+
+	err = mostTypeAttendant.Park(car3)
+	if err != nil {
+		t.Fatal("mosttypeattendant should be able to park car3")
+	}
+	if !parkinglot2.slots[1].car.isEqual(car3) {
+		t.Error("mosttypeattendant should park car3 in parkiglot2, second slot")
+	}
+
+}

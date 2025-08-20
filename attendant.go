@@ -10,6 +10,7 @@ type ParkingType string
 const (
 	SimpleParking ParkingType = "simpleParking"
 	EvenParking   ParkingType = "evenParking"
+	MostCapacity  ParkingType = "mostParking"
 )
 
 type parkinglotMethod func(*Attendant) *ParkingLot
@@ -30,8 +31,10 @@ func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Atten
 	var decideParkinglotMethod parkinglotMethod
 	if parkingPlan == EvenParking {
 		decideParkinglotMethod = findEvenlyDistributedParkingLot
-	} else {
+	} else if parkingPlan == SimpleParking {
 		decideParkinglotMethod = findFirstAvailableParkingLot
+	} else {
+		decideParkinglotMethod = findMostFilledParkingLot
 	}
 
 	attendant.parkinglotMethodStyle = decideParkinglotMethod
@@ -101,6 +104,21 @@ func findFirstAvailableParkingLot(a *Attendant) *ParkingLot {
 		}
 	}
 	return nil
+}
+
+func findMostFilledParkingLot(a *Attendant) *ParkingLot {
+	maxOccupied := math.MinInt64
+	var selectedLot *ParkingLot
+
+	for _, lot := range a.Parkinglots {
+		occupiedCount := countOccupiedSlots(lot)
+		if occupiedCount > maxOccupied {
+			maxOccupied = occupiedCount
+			selectedLot = lot
+		}
+	}
+
+	return selectedLot
 }
 
 func countOccupiedSlots(lot *ParkingLot) int {
