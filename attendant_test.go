@@ -235,7 +235,7 @@ func TestAddentParkUsingTheEvenPlan(t *testing.T) {
 	parkinglot1, _ := NewParkingLot(2)
 	parkinglot2, _ := NewParkingLot(2)
 
-	attendant, err := NewAttendantV2(EvenParking, parkinglot1, parkinglot2)
+	attendant, err := NewAttendantV2(EvenDistributionParking, parkinglot1, parkinglot2)
 	if err != nil {
 		t.Fatal("attendant should be created with evenparking plan")
 	}
@@ -266,8 +266,8 @@ func TestAttendantsAccessTheSameParkinglotReference(t *testing.T) {
 	car3 := &Car{numberPlate: "car3"}
 	car4 := &Car{numberPlate: "car4"}
 
-	simpleAttendant, _ := NewAttendantV2(SimpleParking, parkinglot1, parkinglot2)
-	complexAttendant, _ := NewAttendantV2(EvenParking, parkinglot1, parkinglot2)
+	simpleAttendant, _ := NewAttendantV2(FirstAvailableParking, parkinglot1, parkinglot2)
+	complexAttendant, _ := NewAttendantV2(EvenDistributionParking, parkinglot1, parkinglot2)
 
 	err := simpleAttendant.Park(&car)
 	if err != nil {
@@ -312,8 +312,8 @@ func TestAttendParkInLotWithMostCapacity(t *testing.T) {
 
 	car2 := &Car{numberPlate: "car2"}
 	car3 := &Car{numberPlate: "car3"}
-	evenTypeAttendant, _ := NewAttendantV2(EvenParking, parkinglot1, parkinglot2)
-	mostTypeAttendant, _ := NewAttendantV2(MostCapacity, parkinglot1, parkinglot2)
+	evenTypeAttendant, _ := NewAttendantV2(EvenDistributionParking, parkinglot1, parkinglot2)
+	mostTypeAttendant, _ := NewAttendantV2(MostOccupiedParking, parkinglot1, parkinglot2)
 
 	err := evenTypeAttendant.Park(&car)
 	if err != nil {

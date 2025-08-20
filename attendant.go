@@ -8,9 +8,9 @@ import (
 type ParkingType string
 
 const (
-	SimpleParking ParkingType = "simpleParking"
-	EvenParking   ParkingType = "evenParking"
-	MostCapacity  ParkingType = "mostParking"
+	FirstAvailableParking   ParkingType = "parkOnFirstAvailable"
+	EvenDistributionParking ParkingType = "evenDistributionParking"
+	MostOccupiedParking     ParkingType = "mostOccupiedParking"
 )
 
 type parkinglotMethod func(*Attendant) *ParkingLot
@@ -29,9 +29,9 @@ func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Atten
 	}
 
 	var decideParkinglotMethod parkinglotMethod
-	if parkingPlan == EvenParking {
+	if parkingPlan == EvenDistributionParking {
 		decideParkinglotMethod = findEvenlyDistributedParkingLot
-	} else if parkingPlan == SimpleParking {
+	} else if parkingPlan == FirstAvailableParking {
 		decideParkinglotMethod = findFirstAvailableParkingLot
 	} else {
 		decideParkinglotMethod = findMostFilledParkingLot
