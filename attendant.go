@@ -12,32 +12,34 @@ const (
 	EvenParking   ParkingType = "evenParking"
 )
 
+type parkinglotMethod func(*Attendant) *ParkingLot
+
 type Attendant struct {
-	parkingPlan  ParkingType
-	Parkinglot   []*ParkingLot
-	parkingsFull []bool
+	parkinglotMethodStyle parkinglotMethod
+	parkingPlan           ParkingType
+	Parkinglot            []*ParkingLot
+	parkingsFull          []bool
 }
 
 func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Attendant, error) {
 
-	for _, parkingLot := range parkingLots {
-		if parkingLot == nil {
-			return nil, errors.New("attendant cannot have nil parkinglot")
-		}
+	attendant, err := NewAttendant(parkingLots...)
+	if err != nil {
+		return nil, err
 	}
 
-	statuses := make([]bool, len(parkingLots))
-	attendant := Attendant{
-		parkingPlan:  parkingPlan,
-		Parkinglot:   parkingLots,
-		parkingsFull: statuses,
+	attendant.parkingPlan = parkingPlan
+
+	var decideParkinglotMethod parkinglotMethod
+	if attendant.parkingPlan == EvenParking {
+		decideParkinglotMethod = findEvenlyDistributedParkingLot
+	} else {
+		decideParkinglotMethod = findFirstAvailableParkingLot
 	}
 
-	for _, parkinglot := range parkingLots {
-		parkinglot.OnFull(&attendant)
-	}
+	attendant.parkinglotMethodStyle = decideParkinglotMethod
 
-	return &attendant, nil
+	return attendant, nil
 }
 
 func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
@@ -50,8 +52,9 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 
 	statuses := make([]bool, len(parkingLots))
 	attendant := Attendant{
-		Parkinglot:   parkingLots,
-		parkingsFull: statuses,
+		parkinglotMethodStyle: findFirstAvailableParkingLot,
+		Parkinglot:            parkingLots,
+		parkingsFull:          statuses,
 	}
 
 	for _, parkinglot := range parkingLots {
@@ -70,7 +73,7 @@ func (a *Attendant) Park(car *Car) error {
 		return errors.New("attendant: car already parked")
 	}
 
-	parkinglot := a.findAvailableParkinglot(a.parkingPlan)
+	parkinglot := a.parkinglotMethodStyle(a)
 	if parkinglot == nil {
 		return errors.New("parking lot is full, attendant cannot park the car")
 	}
@@ -79,16 +82,7 @@ func (a *Attendant) Park(car *Car) error {
 
 }
 
-func (a *Attendant) findAvailableParkinglot(parkingPlan ParkingType) *ParkingLot {
-	switch parkingPlan {
-	case EvenParking:
-		return a.findEvenlyDistributedParkingLot()
-	default:
-		return a.findFirstAvailableParkingLot()
-	}
-}
-
-func (a *Attendant) findEvenlyDistributedParkingLot() *ParkingLot {
+func findEvenlyDistributedParkingLot(a *Attendant) *ParkingLot {
 	minOccupied := math.MaxInt64
 	var selectedLot *ParkingLot
 
@@ -103,7 +97,7 @@ func (a *Attendant) findEvenlyDistributedParkingLot() *ParkingLot {
 	return selectedLot
 }
 
-func (a *Attendant) findFirstAvailableParkingLot() *ParkingLot {
+func findFirstAvailableParkingLot(a *Attendant) *ParkingLot {
 	for i, lot := range a.Parkinglot {
 		if !a.parkingsFull[i] {
 			return lot
