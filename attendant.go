@@ -28,18 +28,23 @@ func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Atten
 		return nil, err
 	}
 
-	var decideParkinglotMethod parkinglotMethod
-	if parkingPlan == EvenDistributionParking {
-		decideParkinglotMethod = findEvenlyDistributedParkingLot
-	} else if parkingPlan == FirstAvailableParking {
-		decideParkinglotMethod = findFirstAvailableParkingLot
-	} else {
-		decideParkinglotMethod = findMostFilledParkingLot
-	}
+	parkinglotMethod := decideParkinglotMethod(parkingPlan)
 
-	attendant.parkinglotMethodStyle = decideParkinglotMethod
+	attendant.parkinglotMethodStyle = parkinglotMethod
 
 	return attendant, nil
+}
+
+func decideParkinglotMethod(parkingPlan ParkingType) parkinglotMethod {
+
+	switch parkingPlan {
+	case EvenDistributionParking:
+		return findEvenlyDistributedParkingLot
+	case FirstAvailableParking:
+		return findFirstAvailableParkingLot
+	default:
+		return findMostFilledParkingLot
+	}
 }
 
 func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
