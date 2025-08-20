@@ -43,11 +43,11 @@ type ParkingLot struct {
 	availableSubscribers []ParkingAvailableReceiver
 }
 
-func (p *ParkingLot) OnAvailable(parkingAvailableReceiver ParkingAvailableReceiver) {
+func (p *ParkingLot) AddParkingAvailableReceivers(parkingAvailableReceiver ParkingAvailableReceiver) {
 	p.availableSubscribers = append(p.availableSubscribers, parkingAvailableReceiver)
 }
 
-func (p *ParkingLot) OnFull(r ParkingFullReceiver) {
+func (p *ParkingLot) AddParkingFullReceivers(r ParkingFullReceiver) {
 	p.fullSubscribers = append(p.fullSubscribers, r)
 }
 
@@ -89,7 +89,7 @@ func (p *ParkingLot) park(c *Car) error {
 
 		if p.isFullyFilled() {
 
-			p.notifyReceiver()
+			p.notifyFullReceivers()
 
 		}
 
@@ -111,7 +111,7 @@ func (p *ParkingLot) isFullyFilled() bool {
 
 func (p *ParkingLot) unPark(car *Car) error {
 	if car == nil {
-		return errors.New("parkinglot cannot unpark nil car") //
+		return errors.New("parkinglot cannot unpark nil car")
 	}
 
 	if !p.isParked(car) {
@@ -131,14 +131,14 @@ func (p *ParkingLot) unPark(car *Car) error {
 		p.slots[i].free()
 
 		if isParkingFull {
-			p.notifyAvailableReciever()
+			p.notifyAvailableRecievers()
 		}
 
 	}
 	return nil
 }
 
-func (p *ParkingLot) notifyAvailableReciever() {
+func (p *ParkingLot) notifyAvailableRecievers() {
 	if p.availableSubscribers == nil {
 		return
 	}
@@ -159,7 +159,7 @@ func (p *ParkingLot) isParked(car *Car) bool {
 	return false
 }
 
-func (p *ParkingLot) notifyReceiver() {
+func (p *ParkingLot) notifyFullReceivers() {
 	for _, r := range p.fullSubscribers {
 		r.receiveFull(p.id)
 	}

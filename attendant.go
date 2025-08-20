@@ -58,11 +58,11 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 	}
 
 	for _, parkinglot := range parkingLots {
-		parkinglot.OnFull(&attendant)
+		parkinglot.AddParkingFullReceivers(&attendant)
 	}
 
 	for _, parkinglot := range parkingLots {
-		parkinglot.OnAvailable(&attendant)
+		parkinglot.AddParkingAvailableReceivers(&attendant)
 	}
 
 	return &attendant, nil
