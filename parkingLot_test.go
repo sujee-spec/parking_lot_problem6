@@ -274,7 +274,15 @@ func TestSingleRecieverNotifiedParkingAvailable(t *testing.T) {
 		t.Errorf("Receive Function not called")
 	}
 }
+func TestUnparkNotParkedCar(t *testing.T) {
+	parkinglot, _ := NewParkingLot(2)
 
+	err := parkinglot.unPark(&car)
+
+	if err.Error() != "Car is not found in the parking lot" {
+		t.Errorf("parkinglot cannot unpark the not existing car")
+	}
+}
 func TestCannotNofifyMultiplePeopleWhenParkingAvailable(t *testing.T) {
 	p, _ := NewParkingLot(1)
 	parkingFullReceiver := mockParkingFullReceiver{}
