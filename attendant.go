@@ -8,18 +8,17 @@ import (
 type ParkingType string
 
 const (
-	FirstAvailableParking   ParkingType = "parkOnFirstAvailable"
-	EvenDistributionParking ParkingType = "evenDistributionParking"
-	MostOccupiedParking     ParkingType = "mostOccupiedParking"
+	ParkInFirstAvailableParkinglot    ParkingType = "parkOnFirstAvailable"
+	ParkInParkinglotWithLeastVehicles ParkingType = "parkinglotWithLeastVehicleParking"
+	MostOccupiedParking               ParkingType = "parkonMostOccupiedParking"
 )
 
-// TODO reveal intention
-type parkinglotMethod func(*Attendant) *ParkingLot
+type getParkinglotFn func(*Attendant) *ParkingLot
 
 type Attendant struct {
-	parkinglotMethodStyle parkinglotMethod //what does style mean, reveal intention
-	Parkinglots           []*ParkingLot
-	parkingsFull          []bool //TODO reveal intention
+	parkingPlanFn getParkinglotFn
+	Parkinglots   []*ParkingLot
+	parkingsFull  []bool //TODO reveal intention
 }
 
 func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Attendant, error) {
@@ -29,22 +28,22 @@ func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Atten
 		return nil, err
 	}
 
-	parkinglotMethod := decideParkinglotMethod(parkingPlan) //TODO reveal intention
+	parkingPlanFn := decideParkingPlanFn(parkingPlan)
 
-	attendant.parkinglotMethodStyle = parkinglotMethod
+	attendant.parkingPlanFn = parkingPlanFn
 
 	return attendant, nil
 }
 
-func decideParkinglotMethod(parkingPlan ParkingType) parkinglotMethod { //TODO reveal intention
+func decideParkingPlanFn(parkingPlan ParkingType) getParkinglotFn {
 
 	switch parkingPlan {
-	case EvenDistributionParking:
-		return findEvenlyDistributedParkingLot
-	case FirstAvailableParking:
+	case ParkInParkinglotWithLeastVehicles:
+		return findParkinglotWithLeastVehicle
+	case ParkInFirstAvailableParkinglot:
 		return findFirstAvailableParkingLot
 	default:
-		return findMostFilledParkingLot
+		return findParkinglotWithMostVehicles
 	}
 }
 
@@ -58,9 +57,9 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 
 	statuses := make([]bool, len(parkingLots))
 	attendant := Attendant{
-		parkinglotMethodStyle: findFirstAvailableParkingLot,
-		Parkinglots:           parkingLots,
-		parkingsFull:          statuses,
+		parkingPlanFn: findFirstAvailableParkingLot,
+		Parkinglots:   parkingLots,
+		parkingsFull:  statuses,
 	}
 
 	for _, parkinglot := range parkingLots {
@@ -83,7 +82,7 @@ func (a *Attendant) Park(car *Car) error {
 		return errors.New("attendant cannot park already parked car")
 	}
 
-	parkinglot := a.parkinglotMethodStyle(a)
+	parkinglot := a.parkingPlanFn(a)
 	if parkinglot == nil { //TODO error handling
 		return errors.New("parking lot is full, attendant cannot park the car")
 	}
@@ -92,7 +91,7 @@ func (a *Attendant) Park(car *Car) error {
 
 }
 
-func findEvenlyDistributedParkingLot(a *Attendant) *ParkingLot { //TODO reveal intention
+func findParkinglotWithLeastVehicle(a *Attendant) *ParkingLot {
 	minOccupied := math.MaxInt64
 	var selectedLot *ParkingLot
 
@@ -119,7 +118,7 @@ func findFirstAvailableParkingLot(a *Attendant) *ParkingLot { // TODO error hand
 	return nil
 }
 
-func findMostFilledParkingLot(a *Attendant) *ParkingLot { // TODO error handling
+func findParkinglotWithMostVehicles(a *Attendant) *ParkingLot { // TODO error handling
 	maxOccupied := math.MinInt64
 	var selectedLot *ParkingLot
 
