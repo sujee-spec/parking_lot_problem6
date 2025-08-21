@@ -36,7 +36,7 @@ func TestAttendantCannotParkWhenParkingFull(t *testing.T) {
 	parkingLot, _ := NewParkingLot(1)
 	attendant, _ := NewAttendant(parkingLot)
 
-	expectedError := "parking lot is full, attendant cannot park the car"
+	expectedError := "all parkinglots are full"
 
 	attendant.Park(&Car{"KK10AA1234"})
 
@@ -447,4 +447,50 @@ func TestMostFilledParkingAttendantShouldParkInMostFilledParkingLot(t *testing.T
 		t.Error("car2 shuld be parked in parkinglot2, first slot")
 	}
 
+}
+
+func TestAttendantCannotFindParkinglotWithLeastFilledVehicle(t *testing.T) {
+
+	parkinglot, err := NewParkingLot(1)
+	if err != nil {
+		t.Fatal("parkinglot should be created")
+	}
+
+	attendant, err := NewAttendantV2(ParkInParkinglotWithLeastVehicles, parkinglot)
+	if err != nil {
+		t.Fatal("attendant should be created")
+	}
+	err = attendant.Park(&car)
+	if err != nil {
+		t.Fatal("attendant should be able to park the car")
+	}
+
+	err = attendant.Park(&Car{"car2"})
+	const expectedError = "no parkinglot with least vehicle available"
+	if err.Error() != expectedError {
+		t.Error("attendant should not be able to park the car")
+	}
+}
+
+func TestAttendantCannotFindParkinglotWithMostFilledVehicle(t *testing.T) {
+
+	parkinglot, err := NewParkingLot(1)
+	if err != nil {
+		t.Fatal("parkinglot should be created")
+	}
+
+	attendant, err := NewAttendantV2(MostOccupiedParking, parkinglot)
+	if err != nil {
+		t.Fatal("attendant should be created")
+	}
+	err = attendant.Park(&car)
+	if err != nil {
+		t.Fatal("attendant should be able to park the car")
+	}
+
+	err = attendant.Park(&Car{"car2"})
+	const expectedError = "no parkinglot with most vehicle available"
+	if err.Error() != expectedError {
+		t.Error("attendant should not be able to park the car")
+	}
 }

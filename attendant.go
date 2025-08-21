@@ -13,7 +13,7 @@ const (
 	MostOccupiedParking               ParkingType = "parkonMostOccupiedParking"
 )
 
-type getParkinglotFn func(*Attendant) *ParkingLot
+type getParkinglotFn func(*Attendant) (*ParkingLot, error)
 
 type Attendant struct {
 	parkingPlanFn     getParkinglotFn
@@ -82,18 +82,18 @@ func (a *Attendant) Park(car *Car) error {
 		return errors.New("attendant cannot park already parked car")
 	}
 
-	parkinglot := a.parkingPlanFn(a)
-	if parkinglot == nil { //TODO error handling
-		return errors.New("parking lot is full, attendant cannot park the car")
+	parkinglot, err := a.parkingPlanFn(a)
+	if err != nil {
+		return err
 	}
 
 	return parkinglot.park(car)
 
 }
 
-func findParkinglotWithLeastVehicle(a *Attendant) *ParkingLot {
+func findParkinglotWithLeastVehicle(a *Attendant) (*ParkingLot, error) {
 	minOccupied := math.MaxInt64
-	var selectedLot *ParkingLot
+	selectedLotIndex := -1
 
 	for i, parkingStatus := range a.parkingFullStatus {
 		if parkingStatus {
@@ -102,25 +102,30 @@ func findParkinglotWithLeastVehicle(a *Attendant) *ParkingLot {
 		occupiedCount := a.parkinglots[i].countOccupiedSlots()
 		if occupiedCount < minOccupied {
 			minOccupied = occupiedCount
-			selectedLot = a.parkinglots[i]
+			selectedLotIndex = i
 		}
 	}
+	if selectedLotIndex == -1 {
+		return nil, errors.New("no parkinglot with least vehicle available")
+	}
 
-	return selectedLot
+	return a.parkinglots[selectedLotIndex], nil
 }
 
-func findFirstAvailableParkingLot(a *Attendant) *ParkingLot { // TODO error handling
-	for i, lot := range a.parkinglots {
+func findFirstAvailableParkingLot(a *Attendant) (*ParkingLot, error) {
+
+	for i := range a.parkingFullStatus {
 		if !a.parkingFullStatus[i] {
-			return lot
+			return a.parkinglots[i], nil
 		}
 	}
-	return nil
+	return nil, errors.New("all parkinglots are full")
+
 }
 
-func findParkinglotWithMostVehicles(a *Attendant) *ParkingLot { // TODO error handling
+func findParkinglotWithMostVehicles(a *Attendant) (*ParkingLot, error) {
 	maxOccupied := math.MinInt64
-	var selectedLot *ParkingLot
+	selectedLotIndex := -1
 
 	for i, parkingStatus := range a.parkingFullStatus {
 		if parkingStatus {
@@ -129,11 +134,15 @@ func findParkinglotWithMostVehicles(a *Attendant) *ParkingLot { // TODO error ha
 		occupiedCount := a.parkinglots[i].countOccupiedSlots()
 		if occupiedCount > maxOccupied {
 			maxOccupied = occupiedCount
-			selectedLot = a.parkinglots[i]
+			selectedLotIndex = i
 		}
 	}
 
-	return selectedLot
+	if selectedLotIndex == -1 {
+		return nil, errors.New("no parkinglot with most vehicle available")
+	}
+
+	return a.parkinglots[selectedLotIndex], nil
 }
 
 func (a *Attendant) UnPark(car *Car) error {
