@@ -165,3 +165,13 @@ func (p *ParkingLot) notifyFullReceivers() {
 	}
 
 }
+
+func (lot *ParkingLot) countOccupiedSlots() int {
+	count := 0
+	for _, slot := range lot.slots {
+		if slot.occupied {
+			count++
+		}
+	}
+	return count
+}

@@ -99,7 +99,7 @@ func findParkinglotWithLeastVehicle(a *Attendant) *ParkingLot {
 		if parkingStatus {
 			continue
 		}
-		occupiedCount := countOccupiedSlots(a.parkinglots[i])
+		occupiedCount := a.parkinglots[i].countOccupiedSlots()
 		if occupiedCount < minOccupied {
 			minOccupied = occupiedCount
 			selectedLot = a.parkinglots[i]
@@ -123,7 +123,7 @@ func findParkinglotWithMostVehicles(a *Attendant) *ParkingLot { // TODO error ha
 	var selectedLot *ParkingLot
 
 	for _, lot := range a.parkinglots {
-		occupiedCount := countOccupiedSlots(lot) //TODO who's responsibilty is to give occupieds
+		occupiedCount := lot.countOccupiedSlots()
 		if occupiedCount > maxOccupied {
 			maxOccupied = occupiedCount
 			selectedLot = lot
@@ -131,16 +131,6 @@ func findParkinglotWithMostVehicles(a *Attendant) *ParkingLot { // TODO error ha
 	}
 
 	return selectedLot
-}
-
-func countOccupiedSlots(lot *ParkingLot) int {
-	count := 0
-	for _, slot := range lot.slots {
-		if slot.occupied {
-			count++
-		}
-	}
-	return count
 }
 
 // TODO: refactor
