@@ -96,11 +96,14 @@ func findEvenlyDistributedParkingLot(a *Attendant) *ParkingLot { //TODO reveal i
 	minOccupied := math.MaxInt64
 	var selectedLot *ParkingLot
 
-	for _, lot := range a.Parkinglots {
-		occupiedCount := countOccupiedSlots(lot)
+	for i, parkingStatus := range a.parkingsFull {
+		if parkingStatus {
+			continue
+		}
+		occupiedCount := countOccupiedSlots(a.Parkinglots[i])
 		if occupiedCount < minOccupied {
 			minOccupied = occupiedCount
-			selectedLot = lot
+			selectedLot = a.Parkinglots[i]
 		}
 	}
 
