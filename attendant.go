@@ -17,7 +17,7 @@ type getParkinglotFn func(*Attendant) *ParkingLot
 
 type Attendant struct {
 	parkingPlanFn     getParkinglotFn
-	Parkinglots       []*ParkingLot
+	parkinglots       []*ParkingLot
 	parkingFullStatus []bool
 }
 
@@ -58,7 +58,7 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 	statuses := make([]bool, len(parkingLots))
 	attendant := Attendant{
 		parkingPlanFn:     findFirstAvailableParkingLot,
-		Parkinglots:       parkingLots,
+		parkinglots:       parkingLots,
 		parkingFullStatus: statuses,
 	}
 
@@ -99,10 +99,10 @@ func findParkinglotWithLeastVehicle(a *Attendant) *ParkingLot {
 		if parkingStatus {
 			continue
 		}
-		occupiedCount := countOccupiedSlots(a.Parkinglots[i])
+		occupiedCount := countOccupiedSlots(a.parkinglots[i])
 		if occupiedCount < minOccupied {
 			minOccupied = occupiedCount
-			selectedLot = a.Parkinglots[i]
+			selectedLot = a.parkinglots[i]
 		}
 	}
 
@@ -110,7 +110,7 @@ func findParkinglotWithLeastVehicle(a *Attendant) *ParkingLot {
 }
 
 func findFirstAvailableParkingLot(a *Attendant) *ParkingLot { // TODO error handling
-	for i, lot := range a.Parkinglots {
+	for i, lot := range a.parkinglots {
 		if !a.parkingFullStatus[i] {
 			return lot
 		}
@@ -122,7 +122,7 @@ func findParkinglotWithMostVehicles(a *Attendant) *ParkingLot { // TODO error ha
 	maxOccupied := math.MinInt64
 	var selectedLot *ParkingLot
 
-	for _, lot := range a.Parkinglots {
+	for _, lot := range a.parkinglots {
 		occupiedCount := countOccupiedSlots(lot) //TODO who's responsibilty is to give occupieds
 		if occupiedCount > maxOccupied {
 			maxOccupied = occupiedCount
@@ -154,7 +154,7 @@ func (a *Attendant) UnPark(car *Car) error {
 		return errors.New("attendant cannot unpark, car not found in parlinglots")
 	}
 
-	for _, parkinglot := range a.Parkinglots {
+	for _, parkinglot := range a.parkinglots {
 		if !parkinglot.isParked(car) {
 			continue
 		}
@@ -177,7 +177,7 @@ func (a *Attendant) receiveAvailable(i int) {
 
 // TODO reveal intention , can I renanme this method to isParked?
 func (a *Attendant) checkIsCarParked(car *Car) bool {
-	for _, parkinglot := range a.Parkinglots {
+	for _, parkinglot := range a.parkinglots {
 		if parkinglot.isParked(car) {
 			return true
 		}
