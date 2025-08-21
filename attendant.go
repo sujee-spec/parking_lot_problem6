@@ -78,7 +78,7 @@ func (a *Attendant) Park(car *Car) error {
 		return errors.New("attendant cannot park nil car")
 	}
 
-	if a.checkIsCarParked(car) {
+	if a.isParked(car) {
 		return errors.New("attendant cannot park already parked car")
 	}
 
@@ -139,7 +139,7 @@ func (a *Attendant) UnPark(car *Car) error {
 		return errors.New("attendant cannot unpark nil car")
 	}
 
-	if !a.checkIsCarParked(car) {
+	if !a.isParked(car) {
 		//TODO add tests for removing not parked car and then refactor the unpark method
 		return errors.New("attendant cannot unpark, car not found in parlinglots")
 	}
@@ -163,8 +163,7 @@ func (a *Attendant) receiveParkingAvailableStatus(i int) {
 	a.parkingFullStatus[i] = false
 }
 
-// TODO reveal intention , can I renanme this method to isParked?
-func (a *Attendant) checkIsCarParked(car *Car) bool {
+func (a *Attendant) isParked(car *Car) bool {
 	for _, parkinglot := range a.parkinglots {
 		if parkinglot.isParked(car) {
 			return true

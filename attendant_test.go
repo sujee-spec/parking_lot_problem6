@@ -111,8 +111,8 @@ func TestAttendantShouldCheckCarIsParkedAfterUnpark(t *testing.T) {
 		t.Fatal("car2 should be unparked")
 	}
 
-	isCarParked := attendant.checkIsCarParked(&car)
-	isCar2Parked := attendant.checkIsCarParked(&car2)
+	isCarParked := attendant.isParked(&car)
+	isCar2Parked := attendant.isParked(&car2)
 
 	if isCarParked == false {
 		t.Error("car should be parked in parking lot")
