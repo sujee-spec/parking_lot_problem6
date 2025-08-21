@@ -361,6 +361,7 @@ func TestAttendParkInLotWithMostCapacity(t *testing.T) {
 
 }
 
+/*What do you want to test here? */
 func TestMultipleAttendantsSubscribeToBothParkingNotifications(t *testing.T) {
 	parkinglot1, _ := NewParkingLot(2)
 	parkinglot2, _ := NewParkingLot(2)
@@ -374,6 +375,7 @@ func TestMultipleAttendantsSubscribeToBothParkingNotifications(t *testing.T) {
 	if err != nil {
 		t.Fatalf("simple attendant should be able to park car in parkinglot 1")
 	}
+	//TODO is this validation already done in other dedicated test case which validates the parking plan ?
 	if !parkinglot1.slots[0].car.isEqual(&car) {
 		t.Fatal("car should be parked in parkinglot 1, first slot")
 	}

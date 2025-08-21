@@ -13,12 +13,13 @@ const (
 	MostOccupiedParking     ParkingType = "mostOccupiedParking"
 )
 
+// TODO reveal intention
 type parkinglotMethod func(*Attendant) *ParkingLot
 
 type Attendant struct {
-	parkinglotMethodStyle parkinglotMethod
+	parkinglotMethodStyle parkinglotMethod //what does style mean, reveal intention
 	Parkinglots           []*ParkingLot
-	parkingsFull          []bool
+	parkingsFull          []bool //TODO reveal intention
 }
 
 func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Attendant, error) {
@@ -28,14 +29,14 @@ func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Atten
 		return nil, err
 	}
 
-	parkinglotMethod := decideParkinglotMethod(parkingPlan)
+	parkinglotMethod := decideParkinglotMethod(parkingPlan) //TODO reveal intention
 
 	attendant.parkinglotMethodStyle = parkinglotMethod
 
 	return attendant, nil
 }
 
-func decideParkinglotMethod(parkingPlan ParkingType) parkinglotMethod {
+func decideParkinglotMethod(parkingPlan ParkingType) parkinglotMethod { //TODO reveal intention
 
 	switch parkingPlan {
 	case EvenDistributionParking:
@@ -63,11 +64,11 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 	}
 
 	for _, parkinglot := range parkingLots {
-		parkinglot.AddParkingFullReceivers(&attendant)
+		parkinglot.AddParkingFullReceivers(&attendant) //TODO reveal intention
 	}
 
 	for _, parkinglot := range parkingLots {
-		parkinglot.AddParkingAvailableReceivers(&attendant)
+		parkinglot.AddParkingAvailableReceivers(&attendant) //TODO reveal intention
 	}
 
 	return &attendant, nil
@@ -83,7 +84,7 @@ func (a *Attendant) Park(car *Car) error {
 	}
 
 	parkinglot := a.parkinglotMethodStyle(a)
-	if parkinglot == nil {
+	if parkinglot == nil { //TODO error handling
 		return errors.New("parking lot is full, attendant cannot park the car")
 	}
 
@@ -91,7 +92,7 @@ func (a *Attendant) Park(car *Car) error {
 
 }
 
-func findEvenlyDistributedParkingLot(a *Attendant) *ParkingLot {
+func findEvenlyDistributedParkingLot(a *Attendant) *ParkingLot { //TODO reveal intention
 	minOccupied := math.MaxInt64
 	var selectedLot *ParkingLot
 
@@ -106,7 +107,7 @@ func findEvenlyDistributedParkingLot(a *Attendant) *ParkingLot {
 	return selectedLot
 }
 
-func findFirstAvailableParkingLot(a *Attendant) *ParkingLot {
+func findFirstAvailableParkingLot(a *Attendant) *ParkingLot { // TODO error handling
 	for i, lot := range a.Parkinglots {
 		if !a.parkingsFull[i] {
 			return lot
@@ -115,12 +116,12 @@ func findFirstAvailableParkingLot(a *Attendant) *ParkingLot {
 	return nil
 }
 
-func findMostFilledParkingLot(a *Attendant) *ParkingLot {
+func findMostFilledParkingLot(a *Attendant) *ParkingLot { // TODO error handling
 	maxOccupied := math.MinInt64
 	var selectedLot *ParkingLot
 
 	for _, lot := range a.Parkinglots {
-		occupiedCount := countOccupiedSlots(lot)
+		occupiedCount := countOccupiedSlots(lot) //TODO who's responsibilty is to give occupieds
 		if occupiedCount > maxOccupied {
 			maxOccupied = occupiedCount
 			selectedLot = lot
@@ -147,6 +148,7 @@ func (a *Attendant) UnPark(car *Car) error {
 	}
 
 	if !a.checkIsCarParked(car) {
+		//TODO add tests for removing not parked car and then refactor the unpark method
 		return errors.New("attendant cannot unpark, car not found in parlinglots")
 	}
 
@@ -161,14 +163,17 @@ func (a *Attendant) UnPark(car *Car) error {
 	return nil
 }
 
+// TODO reveal intention
 func (a *Attendant) receiveFull(i int) {
 	a.parkingsFull[i] = true
 }
 
+// TODO reveal intention
 func (a *Attendant) receiveAvailable(i int) {
 	a.parkingsFull[i] = false
 }
 
+// TODO reveal intention , can I renanme this method to isParked?
 func (a *Attendant) checkIsCarParked(car *Car) bool {
 	for _, parkinglot := range a.Parkinglots {
 		if parkinglot.isParked(car) {
