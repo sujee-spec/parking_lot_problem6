@@ -408,3 +408,18 @@ func TestMultipleAttendantsSubscribeToBothParkingNotifications(t *testing.T) {
 	}
 
 }
+
+func TestAttendantCannotUnparkACarThatWasNeverParkedInParkingLot(t *testing.T) {
+	parkinglot, _ := NewParkingLot(2)
+
+	attendant, err := NewAttendantV2(ParkInFirstAvailableParkinglot, parkinglot)
+	if err != nil {
+		t.Fatal("attendant should be created")
+	}
+
+	err = attendant.UnPark(&car)
+	const expectedError = "attendant cannot unpark, car not found in parlinglots"
+	if err.Error() != expectedError {
+		t.Error("attendant cannot unpark the car that was never parked")
+	}
+}
