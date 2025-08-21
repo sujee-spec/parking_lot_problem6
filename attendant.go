@@ -139,11 +139,6 @@ func (a *Attendant) UnPark(car *Car) error {
 		return errors.New("attendant cannot unpark nil car")
 	}
 
-	if !a.isParked(car) {
-		//TODO add tests for removing not parked car and then refactor the unpark method
-		return errors.New("attendant cannot unpark, car not found in parlinglots")
-	}
-
 	for _, parkinglot := range a.parkinglots {
 		if !parkinglot.isParked(car) {
 			continue
@@ -152,7 +147,8 @@ func (a *Attendant) UnPark(car *Car) error {
 		return parkinglot.unPark(car)
 	}
 
-	return nil
+	return errors.New("attendant cannot unpark, car not found in parlinglots")
+
 }
 
 func (a *Attendant) receiveParkingFullStatus(i int) {
