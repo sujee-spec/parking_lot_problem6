@@ -16,9 +16,9 @@ const (
 type getParkinglotFn func(*Attendant) *ParkingLot
 
 type Attendant struct {
-	parkingPlanFn getParkinglotFn
-	Parkinglots   []*ParkingLot
-	parkingsFull  []bool //TODO reveal intention
+	parkingPlanFn     getParkinglotFn
+	Parkinglots       []*ParkingLot
+	parkingFullStatus []bool
 }
 
 func NewAttendantV2(parkingPlan ParkingType, parkingLots ...*ParkingLot) (*Attendant, error) {
@@ -57,9 +57,9 @@ func NewAttendant(parkingLots ...*ParkingLot) (*Attendant, error) {
 
 	statuses := make([]bool, len(parkingLots))
 	attendant := Attendant{
-		parkingPlanFn: findFirstAvailableParkingLot,
-		Parkinglots:   parkingLots,
-		parkingsFull:  statuses,
+		parkingPlanFn:     findFirstAvailableParkingLot,
+		Parkinglots:       parkingLots,
+		parkingFullStatus: statuses,
 	}
 
 	for _, parkinglot := range parkingLots {
@@ -95,7 +95,7 @@ func findParkinglotWithLeastVehicle(a *Attendant) *ParkingLot {
 	minOccupied := math.MaxInt64
 	var selectedLot *ParkingLot
 
-	for i, parkingStatus := range a.parkingsFull {
+	for i, parkingStatus := range a.parkingFullStatus {
 		if parkingStatus {
 			continue
 		}
@@ -111,7 +111,7 @@ func findParkinglotWithLeastVehicle(a *Attendant) *ParkingLot {
 
 func findFirstAvailableParkingLot(a *Attendant) *ParkingLot { // TODO error handling
 	for i, lot := range a.Parkinglots {
-		if !a.parkingsFull[i] {
+		if !a.parkingFullStatus[i] {
 			return lot
 		}
 	}
@@ -167,12 +167,12 @@ func (a *Attendant) UnPark(car *Car) error {
 
 // TODO reveal intention
 func (a *Attendant) receiveFull(i int) {
-	a.parkingsFull[i] = true
+	a.parkingFullStatus[i] = true
 }
 
 // TODO reveal intention
 func (a *Attendant) receiveAvailable(i int) {
-	a.parkingsFull[i] = false
+	a.parkingFullStatus[i] = false
 }
 
 // TODO reveal intention , can I renanme this method to isParked?

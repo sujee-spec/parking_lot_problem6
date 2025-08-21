@@ -388,10 +388,10 @@ func TestMultipleAttendantsSubscribeToBothParkingNotifications(t *testing.T) {
 	if car.isEqual(parkinglot1.slots[0].car) == false {
 		t.Fatal("attendant should park in lot1, first slot")
 	}
-	if simpleAttendant.parkingsFull[0] != true {
+	if simpleAttendant.parkingFullStatus[0] != true {
 		t.Fatal("simple attendant should receive parking full notification")
 	}
-	if complexAttendant.parkingsFull[0] != true {
+	if complexAttendant.parkingFullStatus[0] != true {
 		t.Fatal("complex attendant should receive parking full notification")
 	}
 
@@ -400,10 +400,10 @@ func TestMultipleAttendantsSubscribeToBothParkingNotifications(t *testing.T) {
 	if err != nil {
 		t.Fatalf("simpleattendant should unpark the car %v", err)
 	}
-	if simpleAttendant.parkingsFull[0] != false {
+	if simpleAttendant.parkingFullStatus[0] != false {
 		t.Fatal("simple attendant should receive parking full notification")
 	}
-	if complexAttendant.parkingsFull[0] != false {
+	if complexAttendant.parkingFullStatus[0] != false {
 		t.Fatal("complex attendant should receive parking full notification")
 	}
 
