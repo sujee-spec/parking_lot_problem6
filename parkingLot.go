@@ -43,11 +43,11 @@ type ParkingLot struct {
 	availableSubscribers []ParkingAvailableReceiver
 }
 
-func (p *ParkingLot) AddParkingAvailableReceivers(parkingAvailableReceiver ParkingAvailableReceiver) {
+func (p *ParkingLot) AddParkingAvailableReceiver(parkingAvailableReceiver ParkingAvailableReceiver) {
 	p.availableSubscribers = append(p.availableSubscribers, parkingAvailableReceiver)
 }
 
-func (p *ParkingLot) AddParkingFullReceivers(r ParkingFullReceiver) {
+func (p *ParkingLot) AddParkingFullReceiver(r ParkingFullReceiver) {
 	p.fullSubscribers = append(p.fullSubscribers, r)
 }
 

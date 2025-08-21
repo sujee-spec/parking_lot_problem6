@@ -134,7 +134,7 @@ func TestCheckIfFullReceiverGetsNotifiedWhenCarParkedAfterUnpark(t *testing.T) {
 	s := &mockParkingFullReceiverCounter{}
 
 	p, _ := NewParkingLot(3)
-	p.AddParkingFullReceivers(s)
+	p.AddParkingFullReceiver(s)
 
 	err := p.park(car1)
 	if err != nil {
@@ -246,8 +246,8 @@ func TestMultipleReceiversShouldBeNotifiedWhenParkingFull(t *testing.T) {
 	s := &mockParkingFullReceiver{}
 	another := &mockParkingFullReceiver{}
 
-	p.AddParkingFullReceivers(s)
-	p.AddParkingFullReceivers(another)
+	p.AddParkingFullReceiver(s)
+	p.AddParkingFullReceiver(another)
 	p.park(&car)
 
 	if !s.parkingFull {
@@ -270,7 +270,7 @@ func (m *mockParkingAvailableReceiver) receiveAvailable(i int) {
 func TestSingleRecieverNotifiedParkingAvailable(t *testing.T) {
 	p, _ := NewParkingLot(1)
 	parkingAvailableReceiver := mockParkingAvailableReceiver{}
-	p.AddParkingAvailableReceivers(&parkingAvailableReceiver)
+	p.AddParkingAvailableReceiver(&parkingAvailableReceiver)
 	p.park(&car)
 	p.unPark(&car)
 
@@ -293,9 +293,9 @@ func TestCannotNofifyMultiplePeopleWhenParkingAvailable(t *testing.T) {
 	parkingFullReceiver := mockParkingFullReceiver{}
 	parkingAvailableReceiver := mockParkingAvailableReceiver{}
 
-	p.AddParkingFullReceivers(&parkingFullReceiver)
+	p.AddParkingFullReceiver(&parkingFullReceiver)
 
-	p.AddParkingAvailableReceivers(&parkingAvailableReceiver)
+	p.AddParkingAvailableReceiver(&parkingAvailableReceiver)
 
 	p.park(&car)
 	if !parkingFullReceiver.parkingFull {
@@ -321,8 +321,8 @@ func TestMultipleReceiversShouldBeNotifiedWhenParkingAvailable(t *testing.T) {
 	s := mockParkingAvailableReceiver{}
 	another := mockParkingAvailableReceiver{}
 
-	p.AddParkingAvailableReceivers(&s)
-	p.AddParkingAvailableReceivers(&another)
+	p.AddParkingAvailableReceiver(&s)
+	p.AddParkingAvailableReceiver(&another)
 
 	err := p.park(&car)
 	if err != nil {
@@ -359,8 +359,8 @@ func (o *ReceiveBothNotification) receiveAvailable(int) {
 func TestNotifyOwnerWhenFullAndWhenAvailable(t *testing.T) {
 	p, _ := NewParkingLot(1)
 	owner := ReceiveBothNotification{}
-	p.AddParkingAvailableReceivers(&owner)
-	p.AddParkingFullReceivers(&owner)
+	p.AddParkingAvailableReceiver(&owner)
+	p.AddParkingFullReceiver(&owner)
 	p.park(&car)
 
 	if !owner.notifiedFull {
