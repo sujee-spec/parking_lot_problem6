@@ -423,3 +423,28 @@ func TestAttendantCannotUnparkACarThatWasNeverParkedInParkingLot(t *testing.T) {
 		t.Error("attendant cannot unpark the car that was never parked")
 	}
 }
+
+func TestMostFilledParkingAttendantShouldParkInMostFilledParkingLot(t *testing.T) {
+	parkinglot1, _ := NewParkingLot(1)
+	parkinglot2, _ := NewParkingLot(2)
+
+	mostFilledTypeAttendant, err := NewAttendantV2(MostOccupiedParking, parkinglot1, parkinglot2)
+	if err != nil {
+		t.Fatal("attendant should be created")
+	}
+
+	err = mostFilledTypeAttendant.Park(&car)
+	if err != nil {
+		t.Fatal("attendant should park the car")
+	}
+
+	car2 := &Car{"car2"}
+	err = mostFilledTypeAttendant.Park(car2)
+	if err != nil {
+		t.Fatal("attendant should be able to park car2")
+	}
+	if !mostFilledTypeAttendant.parkinglots[1].slots[0].car.isEqual(car2) {
+		t.Error("car2 shuld be parked in parkinglot2, first slot")
+	}
+
+}

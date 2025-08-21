@@ -122,18 +122,20 @@ func findParkinglotWithMostVehicles(a *Attendant) *ParkingLot { // TODO error ha
 	maxOccupied := math.MinInt64
 	var selectedLot *ParkingLot
 
-	for _, lot := range a.parkinglots {
-		occupiedCount := lot.countOccupiedSlots()
+	for i, parkingStatus := range a.parkingFullStatus {
+		if parkingStatus {
+			continue
+		}
+		occupiedCount := a.parkinglots[i].countOccupiedSlots()
 		if occupiedCount > maxOccupied {
 			maxOccupied = occupiedCount
-			selectedLot = lot
+			selectedLot = a.parkinglots[i]
 		}
 	}
 
 	return selectedLot
 }
 
-// TODO: refactor
 func (a *Attendant) UnPark(car *Car) error {
 	if car == nil {
 		return errors.New("attendant cannot unpark nil car")
