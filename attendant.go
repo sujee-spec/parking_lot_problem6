@@ -155,13 +155,11 @@ func (a *Attendant) UnPark(car *Car) error {
 	return nil
 }
 
-// TODO reveal intention
-func (a *Attendant) receiveFull(i int) {
+func (a *Attendant) receiveParkingFullStatus(i int) {
 	a.parkingFullStatus[i] = true
 }
 
-// TODO reveal intention
-func (a *Attendant) receiveAvailable(i int) {
+func (a *Attendant) receiveParkingAvailableStatus(i int) {
 	a.parkingFullStatus[i] = false
 }
 
